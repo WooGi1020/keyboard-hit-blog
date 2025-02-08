@@ -41,6 +41,10 @@ async function PostContent({ content, imagePath }: { content: string; imagePath:
                 {
                   theme: "one-dark-pro",
                   keepBackground: true,
+                  defaultLang: {
+                    block: "javascript",
+                    inline: "text", // 인라인 코드 처리 방식 다르게 설정
+                  },
                 },
               ],
             ],

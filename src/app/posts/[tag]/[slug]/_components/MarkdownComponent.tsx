@@ -1,7 +1,12 @@
 import CustomPre from "@/app/posts/[tag]/[slug]/_components/CustomPre";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import type { AnchorHTMLAttributes, DetailedHTMLProps, ImgHTMLAttributes } from "react";
+import type {
+  AnchorHTMLAttributes,
+  DetailedHTMLProps,
+  HTMLAttributes,
+  ImgHTMLAttributes,
+} from "react";
 
 const CustomToc = dynamic(() => import("@/app/posts/[tag]/[slug]/_components/CustomToc"), {
   ssr: false,
@@ -29,10 +34,24 @@ function CustomImg({
   return <img src={src} alt={alt || "포스트 이미지"} {...props} />;
 }
 
+function CustomCode({
+  children,
+  className,
+}: DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>) {
+  // `inline code`인지 확인
+  const isInline = !className;
+  return isInline ? (
+    <code className="text-sm text-gray-400 px-1 py-0.5 rounded">{children}</code>
+  ) : (
+    <code className={`${className} text-white`}>{children}</code>
+  );
+}
+
 const components = {
   a: CustomLink,
   img: CustomImg,
   pre: CustomPre,
+  code: CustomCode,
   TOC: CustomToc,
 };
 

@@ -42,7 +42,7 @@ function ProjectCard({ project }: ProjectCardProps) {
         <Image
           src={project.src}
           alt="프로젝트 미리보기 이미지"
-          className="rounded-full object-contain"
+          className="rounded-full object-cover"
           priority
           fill
           sizes="100%"
