@@ -39,12 +39,24 @@ const ABOUT_ME = {
       tag: ["Next.js", "Tailwind", "Typescript", "Shadcn", "Pusher"],
       src: "/images/project/coworkers.png",
     },
+    {
+      name: "GachTaxi",
+      description: "가천대학교 학생들을 위한 택시 동승 서비스",
+      link: "https://github.com/WooGi1020/GachTaxi-FE",
+      period: "2024-12-14 ~ 2025-02-06",
+      tag: ["React", "Tailwind", "Typescript", "Framer-Motion"],
+      src: "/images/project/gachtaxi.png",
+    },
   ],
 
   history: [
     {
       do: "코드잇 스프린트 프론트엔드 6기",
       period: "2024-03-07 ~ 2024-09-02",
+    },
+    {
+      do: "가천대학교 개발동아리 Leets 4기 (외부 협력)",
+      period: "2024-12-18 ~ 2025-02-06",
     },
   ],
 };
