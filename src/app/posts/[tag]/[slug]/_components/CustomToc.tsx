@@ -87,12 +87,12 @@ function CustomToc() {
 
   if (isWebScreen) {
     return (
-      <div className="my-[80px] border-2 border-input pl-8 pb-4">
+      <div className="my-20 border-2 border-input pl-8 pb-4">
         <p className="text-lg text-chart-1">게시글 키워드</p>
         <ul>
           {tocItems.map((item) => (
             <li key={item.id} style={{ marginLeft: (item.level - 1) * 20 }}>
-              <Link href={`#${item.id}`} className="hover:text-gray-600 dark:hover:text-gray-300">
+              <Link href={`#${item.id}`} className="hover:text-gray-600 dark:text-gray-300">
                 {item.text}
               </Link>
             </li>
@@ -117,7 +117,7 @@ function CustomToc() {
             >
               <Link
                 href={`#${item.id}`}
-                className={`hover:text-gray-600 dark:hover:text-gray-300 ${item.level === 2 && "text-sm"}`}
+                className={`hover:text-gray-600 dark:text-gray-200 dark:hover:text-gray-300 ${item.level === 2 && "text-sm"}`}
               >
                 {item.text}
               </Link>
