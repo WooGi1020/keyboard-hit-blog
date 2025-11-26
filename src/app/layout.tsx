@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import localFont from "next/font/local";
+import { JetBrains_Mono } from "next/font/google";
 import Header from "@/components/header/Header";
 import { ThemeProvider } from "@/components/themes/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
@@ -12,6 +13,14 @@ const pretendardFont = localFont({
   preload: true,
   display: "swap",
   variable: "--font-pretendard",
+});
+
+// 1. 폰트 로드 및 변수명 지정 (--font-jetbrains)
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-jetbrains", // ✅ 이 변수명을 기억하세요
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -27,10 +36,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className={`${pretendardFont.className}`}>
+      <body className={`${pretendardFont.className} ${jetbrainsMono.variable}`}>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <Header />
-          <main className="my-[80px] w-full px-[16px] main">{children}</main>
+          <main className="my-20 w-full px-4 main">{children}</main>
           <Footer />
           <Toaster />
         </ThemeProvider>

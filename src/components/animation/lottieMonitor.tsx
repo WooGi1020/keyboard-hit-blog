@@ -1,13 +1,12 @@
 "use client";
 
-import React from "react";
 import Lottie from "lottie-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import darkMonitor from "../../../public/lottie/dark-monitor.json";
 import whiteMonitor from "../../../public/lottie/white-monitor.json";
 
-function LottieKeyboard({ className }: { className?: string }) {
+function LottieMonitor({ className }: { className?: string }) {
   const { theme } = useTheme();
 
   return (
@@ -22,4 +21,4 @@ function LottieKeyboard({ className }: { className?: string }) {
   );
 }
 
-export default LottieKeyboard;
+export default LottieMonitor;

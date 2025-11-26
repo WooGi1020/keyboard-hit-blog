@@ -157,12 +157,30 @@
   }
 
   /* --- [code.css] 통합 --- */
-  pre {
-    overflow-x: auto;
-    padding: 1rem 0;
+  pre > code {
+    display: grid;
+    background-color: transparent !important;
+    padding-left: 10px !important;
+    margin: 0 !important;
+
+    /* ✅ 여기에 폰트 적용 (layout.tsx에서 정의한 변수 사용) */
+    font-family: var(--font-jetbrains), monospace !important;
+
+    /* 폰트 크기나 줄 간격도 여기서 미세 조정 가능 */
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.5;
   }
-  pre [data-line] {
-    padding: 4px;
+
+  /* 코드 한 줄 한 줄의 스타일 */
+  [data-line] {
+    padding: 0 0.5rem; /* 좌우 여백을 조금 주어 가독성 확보 */
+    border-left: 2px solid transparent; /* 하이라이팅 시 레이아웃 흔들림 방지 */
+  }
+
+  /* 하이라이팅 된 라인 스타일 (선택사항) */
+  [data-highlighted-line] {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: #3b82f6; /* 파란색 라인 */
   }
 
   /* --- [prose.css] 통합 --- */
