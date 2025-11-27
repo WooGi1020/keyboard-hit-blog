@@ -9,8 +9,6 @@ interface PostMetaProps {
 }
 
 function PostMeta({ tag, slug }: PostMetaProps) {
-  // ✅ Velite 데이터 검색
-  // tag가 배열(tags)에 포함되어 있고 slug가 일치하는지 확인
   const post = posts.find((p) => p.slug === slug && p.tags.includes(tag));
 
   if (!post) return notFound();

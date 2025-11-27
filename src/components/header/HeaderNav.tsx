@@ -14,10 +14,10 @@ function HeaderNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex justify-between items-center h-full w-full max-w-[1232px] px-[16px] mx-auto">
+    <nav className="flex justify-between items-center h-full w-full max-w-[1232px] px-4 mx-auto">
       <div className="flex gap-3 items-center">
         <Link href="/posts/all">
-          <h1 className="text-[18px] font-semibold">키보드 두들기며 먹고살기</h1>
+          <h1 className="text-[18px] font-semibold outline-none">키보드 두들기며 먹고살기</h1>
         </Link>
         <Link
           href="/about"

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, ArrowRight } from "lucide-react";
 import dayjs from "dayjs";
 import { Post } from "#site/content";
 
@@ -11,50 +11,55 @@ interface PostCardProps {
 function PostCard({ post }: PostCardProps) {
   const formattedDate = dayjs(post.date);
 
-  // ✅ 안전 장치: 태그가 없을 경우를 대비해 기본값 설정
-  // 태그가 아예 없는 경우 URL이 /posts/undefined/slug가 되는 것을 방지
   const mainTag = post.tags && post.tags.length > 0 ? post.tags[0] : "etc";
   const cleanedTag = mainTag.replace(/\./g, "");
-
   const postUrl = `/posts/${mainTag}/${post.slug}`;
-
-  // ✅ 이미지 경로: 썸네일 폴더 구조가 태그명과 100% 일치해야 함을 가정
-  // 공백이 포함된 태그일 경우 인코딩 문제 소지가 있으므로 파일명은 영어/소문자 권장
   const imagePath = `/images/thumbnails/${cleanedTag}/${post.slug}.jpg`;
 
   return (
     <Link
       href={postUrl}
-      className="card hover:hover-card border-2 border-input w-[450px] h-[450px] rounded-xl post group"
+      className="group flex flex-col h-full bg-background rounded-2xl overflow-hidden border border-input transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-black/3 dark:hover:shadow-white/3"
     >
-      <div className="w-full h-[250px] relative overflow-hidden rounded-t-xl">
+      <div className="relative w-full aspect-16/10 overflow-hidden bg-muted">
         <Image
           src={imagePath}
           alt={post.title}
           fill
           priority
-          sizes="(max-width: 768px) 100vw, 450px"
-          // ✅ 이미지 로딩 실패 시 UI가 깨지는 것을 방지하거나 object-cover 유지
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
+        <div className="absolute inset-0 bg-black/5 dark:bg-transparent group-hover:bg-transparent transition-colors" />
       </div>
 
-      <div className="flex flex-col gap-2 p-4 h-[200px]">
-        <span className="text-chart-1 text-sm font-medium">{mainTag}</span>
-
-        <h2 className="text-xl font-semibold line-clamp-2 leading-tight">{post.title}</h2>
-
-        <p className="text-sm dark:text-gray-400 text-gray-500 line-clamp-2">{post.description}</p>
-
-        <div className="mt-auto flex justify-between text-xs text-gray-500 dark:text-gray-400">
-          <div className="flex gap-1.5 items-center">
-            <Calendar className="size-3.5" />
-            <span>{formattedDate.format("YYYY년 MM월 DD일")}</span>
+      <div className="flex flex-col flex-1 p-4 sm:p-5 md:p-6">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[10px] sm:text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/20 px-2 py-1 rounded-md">
+            {mainTag}
+          </span>
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground">
+            <Clock className="size-3 sm:size-3.5" />
+            <span>{post.readingTime || 1} min</span>
           </div>
-          <div className="flex gap-1.5 items-center">
-            <Clock className="size-3.5" />
-            {/* Velite config에서 readingTime을 계산하지 않았을 경우 0 대신 1분으로 표시 */}
-            <span>{post.readingTime || 1}분</span>
+        </div>
+
+        <h2 className="text-lg font-bold leading-snug tracking-tight mb-2 sm:mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 text-balance">
+          {post.title}
+        </h2>
+
+        <p className="text-xs text-muted-foreground line-clamp-2 mb-4 flex-1 leading-relaxed">
+          {post.description}
+        </p>
+
+        <div className="flex items-center justify-between pt-4 border-t border-border/50 mt-auto">
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground font-medium">
+            <Calendar className="size-3 sm:size-3.5" />
+            <span>{formattedDate.format("YYYY. MM. DD")}</span>
+          </div>
+
+          <div className="flex items-center text-[10px] sm:text-xs font-semibold text-primary opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
+            Read more <ArrowRight className="ml-1 size-3 sm:size-3.5" />
           </div>
         </div>
       </div>

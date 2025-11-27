@@ -6,7 +6,6 @@ import { Check, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-// pre 태그의 모든 속성을 포함하는 타입
 type CustomPreProps = React.ComponentPropsWithoutRef<"pre">;
 
 function CustomPre({ children, className, style, ...props }: CustomPreProps) {
@@ -15,7 +14,6 @@ function CustomPre({ children, className, style, ...props }: CustomPreProps) {
   const preRef = useRef<HTMLPreElement>(null);
 
   const handleCopy = async () => {
-    // 텍스트만 깔끔하게 추출
     const code = preRef.current?.textContent;
 
     if (code) {
@@ -31,9 +29,7 @@ function CustomPre({ children, className, style, ...props }: CustomPreProps) {
   };
 
   return (
-    // 1. Wrapper: 여기서 배경색(#282c34)과 테두리, 둥근 모서리를 담당합니다.
     <div className="relative my-6 overflow-hidden rounded-xl border border-zinc-700 bg-[#282c34] shadow-xl dark:border-zinc-800">
-      {/* 2. Mac Style Header */}
       <div className="flex items-center justify-between border-b border-white/10 bg-[#282c34] px-4 py-3">
         <div className="flex gap-2">
           <div className="size-3 rounded-full bg-[#ff5f56]" />
@@ -52,19 +48,14 @@ function CustomPre({ children, className, style, ...props }: CustomPreProps) {
         </Button>
       </div>
 
-      {/* 3. Code Area */}
-      {/* overflow-x-auto를 여기에 주어야 스크롤바가 둥근 모서리 안쪽에 생깁니다 */}
       <div className="relative w-full overflow-x-auto">
         <pre
           ref={preRef}
           {...props}
-          // ✅ 핵심 해결책: 인라인 스타일을 여기서 직접 제어합니다.
-          // 기존 style을 유지하되, background만 투명하게 덮어씁니다.
           style={{ ...style, backgroundColor: "transparent" }}
           className={cn(
-            // Tailwind 클래스로 마진/패딩 초기화 및 폰트 설정
-            "min-w-full py-4 px-4 text-sm font-mono leading-relaxed focus:outline-none",
-            "bg-transparent m-0 border-0", // 명시적 초기화
+            "min-w-full text-sm font-mono leading-relaxed focus:outline-none",
+            "bg-transparent m-0 border-0",
             className
           )}
         >

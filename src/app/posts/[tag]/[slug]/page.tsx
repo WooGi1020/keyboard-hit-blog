@@ -63,7 +63,7 @@ async function PostPage({ params }: Props) {
 
   return (
     <section className="flex flex-col gap-6 w-full max-w-[900px] mx-auto">
-      <div className="min-h-20 mx-auto">
+      <div className="min-h-20 mx-auto max-sm:-mb-4">
         <LottieMonitor className="lottie-animation mx-auto relative bottom-5" />
       </div>
 
