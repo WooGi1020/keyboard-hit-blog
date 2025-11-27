@@ -79,7 +79,7 @@ function CustomToc() {
           variant="secondary"
           size="icon"
           onClick={handleClickCopy}
-          className="rounded-full shadow-lg border border-zinc-200 dark:border-zinc-800 bg-background/80 backdrop-blur"
+          className="rounded-full shadow-lg border-2 border-zinc-200 dark:border-zinc-500 bg-background/80 backdrop-blur"
         >
           <Copy className="size-5" />
         </Button>
@@ -87,7 +87,7 @@ function CustomToc() {
           variant="secondary"
           size="icon"
           onClick={handleClickToComment}
-          className="rounded-full shadow-lg border border-zinc-200 dark:border-zinc-800 bg-background/80 backdrop-blur"
+          className="rounded-full shadow-lg border-2 border-zinc-200 dark:border-zinc-500 bg-background/80 backdrop-blur"
         >
           <MessageSquareText className="size-5" />
         </Button>

@@ -44,7 +44,7 @@ function PostCard({ post }: PostCardProps) {
           </div>
         </div>
 
-        <h2 className="text-lg font-bold leading-snug tracking-tight mb-2 sm:mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 text-balance">
+        <h2 className="text-lg font-bold leading-snug tracking-tight mb-2 sm:mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
           {post.title}
         </h2>
 

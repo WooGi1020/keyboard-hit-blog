@@ -27,11 +27,10 @@ function PostContent({ code, imagePath }: PostContentProps) {
           className="object-contain"
         />
       </div>
+      <CustomToc />
       <div className="prose dark:prose-invert max-w-none">
         <Component components={components} />
       </div>
-
-      <CustomToc />
     </article>
   );
 }
