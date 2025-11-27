@@ -1,18 +1,149 @@
-import CustomPre from "@/app/posts/[tag]/[slug]/_components/CustomPre"; // ✅ CustomPre 경로 확인
+import CustomPre from "@/app/posts/[tag]/[slug]/_components/CustomPre";
 import Link from "next/link";
 import { ComponentPropsWithoutRef } from "react";
-// import CustomToc from "./CustomToc"; // TOC 컴포넌트가 있다면 주석 해제
 
 type AnchorProps = ComponentPropsWithoutRef<"a">;
 type ImgProps = ComponentPropsWithoutRef<"img">;
 type CodeProps = ComponentPropsWithoutRef<"code">;
+type HeadingProps = ComponentPropsWithoutRef<"h1">;
+type ParaProps = ComponentPropsWithoutRef<"p">;
+type ListProps = ComponentPropsWithoutRef<"ul">;
+type LiProps = ComponentPropsWithoutRef<"li">;
+type BlockquoteProps = ComponentPropsWithoutRef<"blockquote">;
+type TableProps = ComponentPropsWithoutRef<"table">;
+type ThProps = ComponentPropsWithoutRef<"th">;
+type TdProps = ComponentPropsWithoutRef<"td">;
 
-// 1. 링크 스타일 (파란색 + 호버 밑줄)
+function CustomH1({ children, ...props }: HeadingProps) {
+  return (
+    <h1
+      className="mt-10 mb-4 text-2xl text-chart-1  sm:text-3xl font-bold tracking-tight scroll-m-20"
+      {...props}
+    >
+      {children}
+    </h1>
+  );
+}
+
+function CustomH2({ children, ...props }: HeadingProps) {
+  return (
+    <h2
+      className="mt-12 mb-4 text-xl sm:text-2xl font-bold tracking-tight text-foreground pb-2 border-b border-border scroll-m-20 first:mt-0"
+      {...props}
+    >
+      {children}
+    </h2>
+  );
+}
+
+function CustomH3({ children, ...props }: HeadingProps) {
+  return (
+    <h3
+      className="mt-8 mb-3 text-lg sm:text-xl font-semibold tracking-tight text-foreground scroll-m-20"
+      {...props}
+    >
+      {children}
+    </h3>
+  );
+}
+
+function CustomH4({ children, ...props }: HeadingProps) {
+  return (
+    <h4
+      className="mt-6 mb-2 text-lg font-semibold tracking-tight text-foreground scroll-m-20"
+      {...props}
+    >
+      {children}
+    </h4>
+  );
+}
+
+function CustomP({ children, ...props }: ParaProps) {
+  return (
+    <p className="leading-7 not-first:mt-6 text-base" {...props}>
+      {children}
+    </p>
+  );
+}
+
+function CustomBlockquote({ children, ...props }: BlockquoteProps) {
+  return (
+    <blockquote
+      className="my-6 border-l-4 border-blue-500 pl-6  italic bg-muted/30 rounded-r-md text-muted-foreground"
+      {...props}
+    >
+      {children}
+    </blockquote>
+  );
+}
+
+function CustomUl({ children, ...props }: ListProps) {
+  return (
+    <ul className="my-6 ml-6 list-disc [&>li]:mt-2 marker:text-muted-foreground" {...props}>
+      {children}
+    </ul>
+  );
+}
+
+function CustomOl({ children, ...props }: ListProps) {
+  return (
+    <ol className="my-6 ml-6 list-decimal [&>li]:mt-2 marker:text-muted-foreground" {...props}>
+      {children}
+    </ol>
+  );
+}
+
+function CustomLi({ children, ...props }: LiProps) {
+  return (
+    <li className="pl-1" {...props}>
+      {children}
+    </li>
+  );
+}
+
+function CustomHr(props: ComponentPropsWithoutRef<"hr">) {
+  return <hr className="my-10 border-border" {...props} />;
+}
+
+// --- [Table Components] ---
+
+function CustomTable({ children, ...props }: TableProps) {
+  return (
+    <div className="my-8 w-full overflow-y-auto">
+      <table className="w-full overflow-hidden rounded-lg border border-border text-sm" {...props}>
+        {children}
+      </table>
+    </div>
+  );
+}
+
+function CustomTh({ children, ...props }: ThProps) {
+  return (
+    <th
+      className="border-b border-border bg-muted/50 px-4 py-3 text-left font-bold text-foreground [[align=center]]:text-center [[align=right]]:text-right"
+      {...props}
+    >
+      {children}
+    </th>
+  );
+}
+
+function CustomTd({ children, ...props }: TdProps) {
+  return (
+    <td
+      className="border-b border-border/40 px-4 py-3 align-middle [[align=center]]:text-center [[align=right]]:text-right last:border-0"
+      {...props}
+    >
+      {children}
+    </td>
+  );
+}
+
+// --- [Existing Components] ---
+
 function CustomLink({ href, children, ...props }: AnchorProps) {
-  const isInternalLink = href && (href.startsWith("/") || href.startsWith("#"));
-
-  const baseClass =
-    "font-medium text-blue-600 dark:text-blue-400 hover:underline underline-offset-4 decoration-2";
+  const isInternalLink = href && href.startsWith("#");
+  const baseClass = "font-medium text-chart-1! transition-colors hover:underline";
 
   if (isInternalLink) {
     return (
@@ -29,34 +160,27 @@ function CustomLink({ href, children, ...props }: AnchorProps) {
   );
 }
 
-// 2. 이미지 스타일 (반응형 + 둥근 모서리 + 그림자)
 function CustomImg({ src, alt, ...props }: ImgProps) {
-  // Next/Image를 Markdown에서 쓰려면 width/height를 알아야 하는데(rehype 플러그인 필요),
-  // 여기서는 안전하게 img 태그를 쓰되 스타일링으로 보완합니다.
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src}
       alt={alt || "content image"}
-      // max-w-full h-auto: 반응형 처리
-      // rounded-xl shadow-lg: 모던한 외관
       className="mx-auto my-8 h-auto max-w-full rounded-xl border border-zinc-200 shadow-lg dark:border-zinc-800"
       {...props}
     />
   );
 }
 
-// 3. 인라인 코드 스타일 (하이라이팅)
 function CustomCode({ children, className, ...props }: CodeProps) {
-  // className이 없으면 인라인 코드 (`code`)입니다.
-  // className이 있으면 코드 블록(```js ... ```) 내부의 code이며, 이는 CustomPre가 처리합니다.
-  const isInline = !className;
+  const isBlock =
+    ("data-language" in props && props["data-language"] !== "text") ||
+    (typeof children === "string" && children.includes("\n"));
 
-  if (isInline) {
+  if (!isBlock) {
     return (
       <code
-        // Zinc 계열 배경색과 텍스트로 차분하게 강조
-        className="rounded-md bg-zinc-200 px-1.5 py-0.5 font-mono text-sm font-semibold text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100"
+        className="relative mx-1 rounded-md border border-zinc-300 bg-zinc-200 px-2 py-1 font-mono text-[1rem] font-medium text-rose-600 dark:border-zinc-700/50 dark:bg-zinc-800 dark:text-rose-400 before:content-none after:content-none"
         {...props}
       >
         {children}
@@ -64,15 +188,32 @@ function CustomCode({ children, className, ...props }: CodeProps) {
     );
   }
 
-  // 코드 블록 내부의 code 태그는 스타일을 CustomPre에 위임하거나 그대로 둡니다.
   return (
-    <code className={className} {...props}>
+    <code className="p-4 font-mono rounded" {...props}>
       {children}
     </code>
   );
 }
 
 const components = {
+  // Typography
+  h1: CustomH1,
+  h2: CustomH2,
+  h3: CustomH3,
+  h4: CustomH4,
+  p: CustomP,
+  blockquote: CustomBlockquote,
+  ul: CustomUl,
+  ol: CustomOl,
+  li: CustomLi,
+  hr: CustomHr,
+
+  // Table
+  table: CustomTable,
+  th: CustomTh,
+  td: CustomTd,
+
+  // Others
   a: CustomLink,
   img: CustomImg,
   pre: CustomPre,
