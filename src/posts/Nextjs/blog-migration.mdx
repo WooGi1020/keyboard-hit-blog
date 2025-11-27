@@ -1,0 +1,241 @@
+---
+title: 블로그 리팩토링 - fs/glob에서 Velite로의 마이그레이션
+description: 파일 시스템 기반 블로그를 Velite로 전환하며 얻은 기술적 경험과 아키텍처 변화
+tag: Next.js
+date: 2025-11-27 21:46:14
+---
+
+<TOC />
+
+# 🚀 마이그레이션을 해봅시다!
+
+- 기존 블로그는 Next.js 14 환경에서 fs, glob, gray-matter, next-mdx-remote를 조합하여 구축하는 형태
+- 파일 시스템에 직접 접근하여 MDX 파일을 읽고 파싱하는 고전적인 방식은 직관적이지만, 여러 가지 문제점이 있었고 Next 버전을 업그레이드하면서 겸사겸사 모던한 방식도 경험해보고 싶어졌다.
+
+> 이번 리팩토링의 핵심은 "콘텐츠를 데이터로 취급"하는 아키텍처로의 전환이며, 이를 위해 Velite를 도입했다.
+
+## 🛠️ 레거시: 파일 시스템 기반 접근의 한계
+
+- 기존 방식은 런타임 혹은 빌드 타임에 Node.js API를 통해 직접 파일을 핸들링해야 했다.
+
+### 1. `Boilerplate`와 수동 타이핑
+
+- 모든 포스트를 가져오기 위해 glob으로 경로를 찾고, fs로 파일을 읽은 뒤, gray-matter로 메타데이터를 분리하는 과정이 필요했다.
+- 이처럼 내용 파싱, 경로 생성, 메타데이터 추출 등의 각각의 함수들이 엉켜 사용되어 복잡성이 더해졌다.
+
+```ts
+import { sync } from "glob";
+import path from "path";
+import fs from "fs";
+import matter from "gray-matter";
+import type { Params } from "@blogType";
+import { cache } from "react";
+
+const BASE_PATH = "src/posts";
+const POST_PATH = path.join(process.cwd(), BASE_PATH);
+
+// 특정 태그에 해당하는 포스트 경로를 가져오는 함수
+export const getPostsByTag = async (tag?: string) => {
+  let paths: { slug: string }[];
+
+  if (tag && tag !== "all") {
+    const postPaths: string[] = sync(`${POST_PATH}/${tag}/*.mdx`);
+    paths = postPaths.map((filePath) => ({
+      slug: path.relative(POST_PATH, filePath).replace(/\\/g, "/").replace(".mdx", ""),
+    }));
+  } else {
+    const postPaths: string[] = sync(`${POST_PATH}/*/*.mdx`);
+    paths = postPaths.map((filePath) => ({
+      slug: path.relative(POST_PATH, filePath).replace(/\\/g, "/").replace(".mdx", ""),
+    }));
+  }
+
+  return paths;
+};
+
+// 태그와 슬러그를 사용하여 포스트를 가져오는 함수
+export const getPosts = cache(async (params: Params) => {
+  const filePaths = await getPostsByTag(params.tag); // 태그를 기준으로 포스트 파일 경로 가져오기
+  const { tag, slug } = params; // tag와 slug를 destructuring으로 추출
+
+  // 태그와 슬러그를 기준으로 포스트 찾기
+  const postFind = filePaths.find((filePath) => {
+    const isMatchingTag = filePath.slug.startsWith(tag);
+    const isMatchingSlug = filePath.slug.split("/").pop() === slug;
+
+    return isMatchingTag && isMatchingSlug;
+  });
+
+  return postFind || null; // 포스트를 찾으면 반환하고, 없으면 null 반환
+});
+
+// 태그와 슬러그를 사용하여 포스트의 내용을 파싱하는 함수
+export const parsePosts = async (params: Params) => {
+  const { tag, slug } = params; // tag와 slug를 destructuring으로 추출
+  const post = await getPosts({ tag, slug }); // 태그와 슬러그를 사용하여 포스트 가져오기
+
+  if (!post) {
+    throw new Error("Post not found");
+  }
+
+  const postPath = path.join(POST_PATH, `${tag}/${slug}.mdx`); // [tag]/[slug] 형식으로 파일 경로 생성
+  const mdFile = fs.readFileSync(postPath, "utf-8"); // 파일 읽기
+  const { data: frontmatter, content } = matter(mdFile); // frontmatter와 content 파싱
+
+  return {
+    frontmatter,
+    content,
+  };
+};
+
+// 슬러그에 해당하는 포스트 메타데이터를 가져오는 함수
+export const getPostMeta = ({ slug }: { slug: string }) => {
+  const metaPath = `${POST_PATH}/${slug}.mdx`; // 슬러그에 해당하는 메타 파일 경로
+  const mdFile = fs.readFileSync(metaPath, "utf-8"); // 파일 읽기
+  const { data: frontmatter, content } = matter(mdFile); // frontmatter와 content 파싱
+
+  return { frontmatter, content };
+};
+
+export const getAllPostUrl = () => {
+  const paths: string[] = sync(`${POST_PATH}/*/*.mdx`);
+
+  const posts = paths.map((onePath) => {
+    const formattedPath = onePath.replace(".mdx", "").slice(4);
+    const realPath = formattedPath.replace(/\\/g, "/");
+
+    const { data: frontmatter } = matter(fs.readFileSync(onePath, "utf-8"));
+
+    return {
+      path: realPath,
+      date: frontmatter.date,
+    };
+  });
+
+  return posts;
+};
+
+export const getAllTag = () => {
+  const tagPaths: string[] = sync(`${POST_PATH}/*`); // 모든 태그 폴더 경로 가져오기
+  const allTagCount: number = sync(`${POST_PATH}/*/*.mdx`).length;
+
+  const tagInfos = tagPaths.map((folderPath) => {
+    // 폴더 이름
+    const folderName = path.relative(POST_PATH, folderPath).replace(/\\/g, "/");
+
+    // 해당 폴더 안의 .mdx 파일 개수
+    const fileCount = sync(`${BASE_PATH}/${folderName}/*.mdx`).length;
+
+    return {
+      tag: folderName, // 폴더 이름
+      count: fileCount, // 파일 개수
+    };
+  });
+
+  return { tagInfos, allTagCount };
+};
+```
+
+### 2. 런타임 오버헤드와 복잡한 데이터 가공
+
+- readingTime 계산이나 날짜 포맷팅 같은 로직이 컴포넌트 내부나 유틸리티 함수에 산재되어 있어서 렌더링 시점에 연산을 수행하게 되어 불필요한 오버헤드를 유발했다.
+
+## ✨ 솔루션: Velite 도입
+
+- Velite는 콘텐츠를 빌드 타임에 타입 안전한 JSON 데이터로 변환해주는 `Content Layer` 도구입니다. 기존 빌드타임 변환 라이브러리인 `ContentLayer`의 유지보수가 중단된 시점에서 가장 강력한 대안
+
+### 1. `Config` 기반의 스키마 정의 (Zod)
+
+- Velite는 Zod 스키마를 사용하여 Frontmatter를 검증하여 필수 필드 누락이나 타입 불일치를 빌드 단계에서 캐치가 가능해진다.
+
+```ts
+// velite.config.ts
+import { defineConfig, defineCollection, s } from "velite";
+
+const posts = defineCollection({
+  name: "Post",
+  pattern: "\*_/_.mdx",
+  schema: s
+    .object({
+      title: s.string().max(99),
+      slug: s.path(), // 파일 경로 기반 자동 생성
+      date: s.isodate(),
+      description: s.string().max(200).optional(),
+      tags: s.array(s.string()).default([]),
+      code: s.mdx(),
+    })
+    .transform((data) => ({
+      ...data,
+      permalink: `/posts/${data.slug}`,
+      readingTime: calculateReadingTime(data.code), // 빌드 타임 연산
+    })),
+});
+
+export default defineConfig({
+  root: "content",
+  output: {
+    data: ".velite",
+    assets: "public/static",
+    // ...
+  },
+  collections: { posts },
+});
+```
+
+### 2. 연산 위임
+
+- 기존에 컴포넌트 레벨에서 수행하던 readingTime 계산이나 slug 가공 로직을 transform 단계로 이동시킴으로써, 데이터를 완벽하게 가공한 채로 사용할 수 있게 되었다.
+
+## 📈 아키텍처 변화 및 이점
+
+### 1. Zero Runtime Overhead
+
+- Velite는 빌드 시점에 .velite 폴더에 최적화된 JSON 파일을 생성한다.
+- Next.js 앱은 파일 시스템을 뒤지는 대신, 메모리에 로드된 JSON을 단순히 `import` 하여 사용하게 된다.
+
+Before:
+
+```ts
+// Page.tsx
+const post = await getPostBySlug(params.slug); // 비동기 I/O 발생
+```
+
+After:
+
+```ts
+// Page.tsx
+import { posts } from "#site/content"; // 정적 데이터 Import
+
+const post = posts.find((p) => p.slug === params.slug); // 동기적 메모리 조회
+```
+
+### 2. 완벽한 Type Inference
+
+Velite가 스키마를 기반으로 TypeScript 타입을 자동 생성하여 `interface`를 따로 정의할 필요가 없어진다.
+
+```ts
+// 자동 완성 지원
+posts.map((post) => (
+
+<Card title={post.title} date={post.date} />
+// post.titl (오타 발생 시 즉시 에러) ));
+```
+
+### 3. MDX 컴파일 최적화
+
+- 기존 next-mdx-remote는 요청마다 MDX를 컴파일하거나 별도의 캐싱 전략이 필요했다. (사실 캐싱은 생각도 안했다..)
+- Velite는 빌드 시점에 MDX를 컴파일하여 code 필드에 저장해두므로, 클라이언트는 가벼운 런타임 실행만 남게 되어 성능 개선이 가능해진다.
+
+## 📝 결론
+
+- Velite로의 마이그레이션은 단순한 라이브러리 교체가 아닌, 데이터 흐름의 최적화 과정
+
+- 안정성: Zod 스키마를 통한 엄격한 타입 검증
+
+- 성능: I/O 연산을 빌드 타임으로 앞당겨 런타임 부하 제거
+
+- DX(개발자 경험): 자동 타입 생성과 중앙화된 데이터 관리
+
+> 파일 시스템을 직접 다루는 경험을 먼저 하고, 이를 토대로 콘텐츠 자체에 집중할 수 있는 환경을 구축해볼 수 있어서 매우 유익한 마이그레이션 과정이었다.
+
+[Velite에 관심있는 분들은 여기로!](https://velite.js.org/)

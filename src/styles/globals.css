@@ -2,13 +2,9 @@
 
 @variant dark (&:where(.dark, .dark *));
 
-/* 1. 플러그인 로드 */
 @plugin "tailwindcss-animate";
-@plugin "@tailwindcss/typography";
 
-/* 2. 테마 및 애니메이션 설정 (Config 대체) */
 @theme {
-  /* Shadcn UI 컬러 매핑 */
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
@@ -38,7 +34,6 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
-  /* 애니메이션 정의 */
   --animate-fall: fall 0.7s ease-in-out;
   --animate-bounce: bounce 2s ease-in-out infinite;
   --animate-show: show 0.7s ease;
@@ -77,9 +72,7 @@
   }
 }
 
-/* 3. 베이스 레이어 (여기로 변수 이동됨) */
 @layer base {
-  /* ✅ 변수 선언을 base 레이어 최상단으로 이동 */
   :root {
     --background: 0 0% 96%;
     --foreground: 0 0% 3.9%;
@@ -154,70 +147,6 @@
 
   body {
     @apply bg-background text-foreground transition-colors duration-100 ease-in-out;
-  }
-
-  /* --- [code.css] 통합 --- */
-  pre > code {
-    display: grid;
-    background-color: transparent !important;
-    padding-left: 10px !important;
-    margin: 0 !important;
-
-    /* ✅ 여기에 폰트 적용 (layout.tsx에서 정의한 변수 사용) */
-    font-family: var(--font-jetbrains), monospace !important;
-
-    /* 폰트 크기나 줄 간격도 여기서 미세 조정 가능 */
-    font-size: 0.875rem; /* 14px */
-    line-height: 1.5;
-  }
-
-  /* 코드 한 줄 한 줄의 스타일 */
-  [data-line] {
-    padding: 0 0.5rem; /* 좌우 여백을 조금 주어 가독성 확보 */
-    border-left: 2px solid transparent; /* 하이라이팅 시 레이아웃 흔들림 방지 */
-  }
-
-  /* 하이라이팅 된 라인 스타일 (선택사항) */
-  [data-highlighted-line] {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-left-color: #3b82f6; /* 파란색 라인 */
-  }
-
-  /* --- [prose.css] 통합 --- */
-  .prose :where(*),
-  .prose :where(h1),
-  .prose :where(h2),
-  .prose :where(h3),
-  .prose :where(h4),
-  .prose :where(strong),
-  .prose :where(a) {
-    @apply text-primary;
-  }
-
-  /* Typography scroll margin override */
-  .prose :where(h1, h2, h3, h4) {
-    scroll-margin-top: theme("spacing.20");
-  }
-
-  .prose :where(hr) {
-    @apply border border-gray-400 dark:border-gray-500;
-  }
-
-  .prose :where(a):hover {
-    @apply underline;
-  }
-
-  .prose :where(ul li) {
-    @apply no-underline;
-  }
-
-  .prose :where(code):not(:where(pre > code)) {
-    @apply py-0 px-1 rounded-md mx-1 text-primary bg-input border-4 border-input;
-  }
-
-  .prose :where(code):not([data-language])::before,
-  .prose :where(code):not([data-language])::after {
-    content: "";
   }
 }
 
