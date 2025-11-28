@@ -1,18 +1,11 @@
 const ABOUT_ME = {
   name: "정우기",
   avatar: "https://avatars.githubusercontent.com/u/113000290?v=4",
-  role: "주어진 컨셉에 충실한 프론트엔드 엔지니어",
+  role: "컨셉에 충실한 프론트엔드 엔지니어",
   address: "대한민국 경기도",
 
   description:
-    "모든 프로젝트는 정해진 컨셉을 유지하고 지속적으로 관리하는 일이며, 이를 이끄는 개발자야말로 항상 컨셉에 충실해야한다고 생각합니다.\n하고자 하는 일을 위해 노력하고 주어진 환경에 잘 적응한다는 저만의 컨셉을 유지하기 위해 끊임없이 노력합니다.",
-
-  online: [
-    {
-      name: "Github",
-      link: "https://github.com/WooGi1020",
-    },
-  ],
+    "모든 프로젝트는 정해진 컨셉을 유지하고 이를 관리하는 일이며, 이를 이끌어가는 개발자야말로 항상 컨셉에 충실해야 한다고 생각합니다.\n이러한 신념을 바탕으로, 스스로 계속 발전하는 사람이 되겠다는 저만의 컨셉을 지키기 위해 끊임없이 노력합니다.",
 
   project: [
     {
@@ -46,6 +39,14 @@ const ABOUT_ME = {
       period: "2024-12-14 ~ 2025-02-06",
       tag: ["React", "Tailwind", "Typescript", "Framer-Motion"],
       src: "/images/project/gachtaxi.png",
+    },
+    {
+      name: "Fresh Plate",
+      description: "비건 & 알러지인들을 위한 외식 정보 제공 플랫폼 - 졸업 프로젝트",
+      link: "https://github.com/WooGi1020/fresh_plate",
+      period: "2024-05-24 ~ 2025-11-11",
+      tag: ["Next.js", "Tailwind", "Typescript", "Kakao-Map-API"],
+      src: "/images/project/freshPlate.png",
     },
   ],
 

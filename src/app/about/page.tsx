@@ -1,10 +1,4 @@
-import {
-  AboutHistory,
-  AboutMeta,
-  AboutOnline,
-  AboutOpinion,
-  AboutProject,
-} from "@/app/about/_components";
+import { AboutHistory, AboutMeta, AboutOpinion, AboutProject } from "@/app/about/_components";
 
 function AboutPage() {
   return (
@@ -14,7 +8,6 @@ function AboutPage() {
       </h2>
       <AboutMeta />
       <AboutOpinion />
-      <AboutOnline />
       <AboutProject />
       <AboutHistory />
     </div>

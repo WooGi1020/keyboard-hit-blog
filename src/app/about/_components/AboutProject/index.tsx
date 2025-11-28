@@ -10,8 +10,8 @@ function AboutProject() {
 
   const projectArr = ABOUT_ME.project.slice(0, sliceNum);
 
-  const handleMoreView = () => {
-    setSliceNum((prev) => prev + 3);
+  const handleViewCount = () => {
+    sliceNum === 3 ? setSliceNum((prev) => prev + 3) : setSliceNum(3);
   };
 
   return (
@@ -21,11 +21,9 @@ function AboutProject() {
         {projectArr.map((project) => (
           <ProjectCard key={project.name} project={project} />
         ))}
-        {ABOUT_ME.project.length > projectArr.length && (
-          <Button variant="outline" className="w-fit mx-auto" onClick={handleMoreView}>
-            더보기
-          </Button>
-        )}
+        <Button variant="outline" className="w-fit mx-auto" onClick={handleViewCount}>
+          {sliceNum === 3 ? "더보기" : "접기"}
+        </Button>
       </div>
     </>
   );
