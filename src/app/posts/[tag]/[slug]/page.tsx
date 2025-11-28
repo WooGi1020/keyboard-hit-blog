@@ -5,6 +5,7 @@ import PostMeta from "@/app/posts/[tag]/[slug]/_components/PostMeta";
 import PostContent from "@/app/posts/[tag]/[slug]/_components/PostContent";
 import Giscus from "@/components/giscus/Giscus";
 import LottieMonitor from "@/components/animation/lottieMonitor";
+import dayjs from "dayjs";
 
 interface Params {
   tag: string;
@@ -21,6 +22,7 @@ export async function generateMetadata({ params }: Props) {
 
   // Velite 데이터는 메모리에 로드되므로 동기적으로 검색
   const post = posts.find((p) => p.slug === slug && p.tags.includes(tag));
+  const formattedDate = dayjs(post!.date);
 
   if (!post) {
     return getMetaData({
@@ -34,7 +36,7 @@ export async function generateMetadata({ params }: Props) {
     title: post.title,
     description: post.description!,
     asPath: `/posts/${tag}/${slug}`,
-    ogImage: `/images/thumbnails/${tag}/${slug}.jpg`,
+    ogImage: `/api/og?title=${encodeURIComponent(post.title)}&tag=${encodeURIComponent(tag)}&date=${formattedDate.format("YYYY-MM-DD")}&v=2`,
   });
 }
 
@@ -53,13 +55,13 @@ export async function generateStaticParams() {
 async function PostPage({ params }: Props) {
   const resolvedParams = await params;
   const { tag, slug } = resolvedParams;
-  const cleanedTag = tag.replace(/\./g, "");
 
   const post = posts.find((p) => p.slug === slug && p.tags.includes(tag));
+  const formattedDate = dayjs(post!.date);
 
   if (!post) return notFound();
 
-  const imagePath = `${cleanedTag}/${slug}`;
+  const imagePath = `/api/og?title=${encodeURIComponent(post.title)}&tag=${encodeURIComponent(tag)}&date=${formattedDate.format("YYYY-MM-DD")}`;
 
   return (
     <section className="flex flex-col gap-6 w-full max-w-[900px] mx-auto">

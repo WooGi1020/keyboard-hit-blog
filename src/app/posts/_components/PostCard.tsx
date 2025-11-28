@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 import dayjs from "dayjs";
 import { Post } from "#site/content";
+import { IDE_BLUR_DATA_URL } from "@/constant/BLUR_IMAGE";
 
 interface PostCardProps {
   post: Post;
@@ -12,28 +13,30 @@ function PostCard({ post }: PostCardProps) {
   const formattedDate = dayjs(post.date);
 
   const mainTag = post.tags && post.tags.length > 0 ? post.tags[0] : "etc";
-  const cleanedTag = mainTag.replace(/\./g, "");
   const postUrl = `/posts/${mainTag}/${post.slug}`;
-  const imagePath = `/images/thumbnails/${cleanedTag}/${post.slug}.jpg`;
+  const imagePath = `/api/og?title=${encodeURIComponent(post.title)}&tag=${encodeURIComponent(mainTag)}&date=${formattedDate.format("YYYY-MM-DD")}`;
 
   return (
     <Link
       href={postUrl}
       className="group flex flex-col h-full bg-background rounded-2xl overflow-hidden border border-input transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-black/3 dark:hover:shadow-white/3"
     >
-      <div className="relative w-full aspect-16/10 overflow-hidden bg-muted">
+      <div className="relative w-full aspect-16/10 overflow-hidden bg-muted bottom-4.5">
         <Image
           src={imagePath}
           alt={post.title}
           fill
+          placeholder="blur"
+          blurDataURL={IDE_BLUR_DATA_URL}
           priority
+          unoptimized
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-contain transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-black/5 dark:bg-transparent group-hover:bg-transparent transition-colors" />
       </div>
 
-      <div className="flex flex-col flex-1 p-4 sm:p-5 md:p-6">
+      <div className="flex flex-col flex-1 px-4 sm:px-5 md:px-6">
         <div className="flex items-center justify-between mb-3">
           <span className="text-[10px] sm:text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/20 px-2 py-1 rounded-md">
             {mainTag}
@@ -52,7 +55,7 @@ function PostCard({ post }: PostCardProps) {
           {post.description}
         </p>
 
-        <div className="flex items-center justify-between pt-4 border-t border-border/50 mt-auto">
+        <div className="flex items-center justify-between py-4 border-t border-border/50 mt-auto">
           <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground font-medium">
             <Calendar className="size-3 sm:size-3.5" />
             <span>{formattedDate.format("YYYY. MM. DD")}</span>

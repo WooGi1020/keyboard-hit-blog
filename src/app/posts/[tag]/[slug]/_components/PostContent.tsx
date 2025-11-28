@@ -20,9 +20,10 @@ function PostContent({ code, imagePath }: PostContentProps) {
     <article className="relative w-full max-w-[900px] mx-auto">
       <div className="relative w-full aspect-21/9 mb-10 overflow-hidden">
         <Image
-          src={`/images/thumbnails/${imagePath}.jpg`}
+          src={imagePath}
           alt="포스트 썸네일 이미지"
           fill
+          unoptimized
           priority
           className="object-contain"
         />
