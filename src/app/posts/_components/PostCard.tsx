@@ -21,19 +21,15 @@ function PostCard({ post }: PostCardProps) {
       href={postUrl}
       className="group flex flex-col h-full bg-background rounded-2xl overflow-hidden border border-input transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-black/3 dark:hover:shadow-white/3"
     >
-      <div className="relative w-full aspect-16/10 overflow-hidden bg-muted bottom-4.5">
+      <div className="relative w-full aspect-16/10 overflow-hidden bottom-4.5">
         <Image
           src={imagePath}
           alt={post.title}
           fill
-          placeholder="blur"
-          blurDataURL={IDE_BLUR_DATA_URL}
           priority
           unoptimized
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-contain transition-transform duration-500 group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-black/5 dark:bg-transparent group-hover:bg-transparent transition-colors" />
       </div>
 
       <div className="flex flex-col flex-1 px-4 sm:px-5 md:px-6">
