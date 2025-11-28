@@ -1,31 +1,14 @@
 import { posts } from "#site/content";
 import { TagNav } from "@/app/posts/[tag]/(tagNav)/TagNav";
 import Posts from "@/app/posts/_components/Posts";
-import { getMetaData } from "@/lib/getMetaData";
+import { getMetaData } from "@/utils/getMetaData";
 import LottieKeyboard from "@/components/animation/lottieKeyboard";
 import { notFound } from "next/navigation";
+import { getTagData } from "@/utils/tagUtil";
 
 type Props = {
   params: Promise<{ tag: string }>;
 };
-
-function getTagData() {
-  const allTagCount = posts.length;
-  const tagCountMap: Record<string, number> = {};
-
-  posts.forEach((post) => {
-    post.tags.forEach((tag) => {
-      tagCountMap[tag] = (tagCountMap[tag] || 0) + 1;
-    });
-  });
-
-  const tagInfos = Object.entries(tagCountMap).map(([tag, count]) => ({
-    tag,
-    count,
-  }));
-
-  return { tagInfos, allTagCount };
-}
 
 export async function generateStaticParams() {
   const tags = new Set(posts.flatMap((post) => post.tags));
@@ -44,7 +27,7 @@ export async function generateMetadata({ params }: Props) {
   const decodedTag = decodeURIComponent(tag);
 
   return getMetaData({
-    title: decodedTag === "all" ? "전체 포스트" : decodedTag,
+    title: decodedTag,
     description: `Post 목록 - ${decodedTag}`,
     asPath: `/posts/${tag}`,
     ogImage: `/images/opgraph/op-image.png`,
@@ -57,10 +40,9 @@ async function PostsPage({ params }: Props) {
 
   const { tagInfos, allTagCount } = getTagData();
 
-  const isAll = decodedTag === "all";
   const isValidTag = tagInfos.some((t) => t.tag === decodedTag);
 
-  if (!isAll && !isValidTag) {
+  if (!isValidTag) {
     return notFound();
   }
 

@@ -1,6 +1,6 @@
 import { posts } from "#site/content"; // ✅ Velite 데이터
 import { notFound } from "next/navigation";
-import { getMetaData } from "@/lib/getMetaData";
+import { getMetaData } from "@/utils/getMetaData";
 import PostMeta from "@/app/posts/[tag]/[slug]/_components/PostMeta";
 import PostContent from "@/app/posts/[tag]/[slug]/_components/PostContent";
 import Giscus from "@/components/giscus/Giscus";
