@@ -26,7 +26,7 @@ function CustomToc() {
   const isMobile = useMediaQuery(`(max-width: ${MOBILE_MAX_WIDTH})`);
   const isTablet = useMediaQuery(`(max-width: ${WEB_MAX_WIDTH})`);
 
-  const handleClickBack = () => router.push("/posts/all");
+  const handleClickBack = () => router.push("/");
 
   const handleClickCopy = async () => {
     try {

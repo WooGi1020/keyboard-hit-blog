@@ -5,7 +5,7 @@ import { MapIcon } from "lucide-react";
 function AboutMeta() {
   return (
     <>
-      <span className="text-chart-1 mb-[-40px]">Who am I?</span>
+      <span className="text-chart-1 -mb-10">Who am I?</span>
       <div className="flex justify-between w-full">
         <div className="flex flex-col gap-2">
           <h1 className="text-[40px] font-bold max-sm:text-[32px]">{ABOUT_ME.name}</h1>

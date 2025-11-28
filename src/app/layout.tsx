@@ -39,7 +39,9 @@ export default function RootLayout({
       <body className={`${pretendardFont.className} ${jetbrainsMono.variable}`}>
         <ThemeProvider attribute="class" defaultTheme="dark">
           <Header />
-          <main className="my-20 w-full px-4 main">{children}</main>
+          <main className="my-20 w-full px-4 main">
+            <section className="flex flex-col gap-6">{children}</section>
+          </main>
           <Footer />
           <Toaster />
         </ThemeProvider>

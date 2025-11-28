@@ -16,7 +16,7 @@ function HeaderNav() {
   return (
     <nav className="flex justify-between items-center h-full w-full max-w-[1232px] px-4 mx-auto">
       <div className="flex gap-3 items-center">
-        <Link href="/posts/all">
+        <Link href="/">
           <h1 className="text-[18px] font-semibold outline-none">키보드 두들기며 먹고살기</h1>
         </Link>
         <Link
