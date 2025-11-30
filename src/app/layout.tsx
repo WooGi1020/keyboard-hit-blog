@@ -37,7 +37,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${pretendardFont.className} ${jetbrainsMono.variable}`}>
-        <ThemeProvider attribute="class" defaultTheme="dark">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Header />
           <main className="my-20 w-full px-4 main">
             <section className="flex flex-col gap-6">{children}</section>
