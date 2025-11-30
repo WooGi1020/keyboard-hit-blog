@@ -6,7 +6,6 @@ import { getTagData } from "@/utils/tagUtil";
 
 export async function generateMetadata() {
   return getMetaData({
-    title: "전체 포스트",
     description: "개발 블로그 메인 페이지",
     asPath: "/",
     ogImage: "/images/opgraph/op-image.png",
