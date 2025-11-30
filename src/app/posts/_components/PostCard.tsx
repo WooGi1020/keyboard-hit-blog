@@ -15,7 +15,7 @@ function PostCard({ post }: PostCardProps) {
 
   const mainTag = post.tags && post.tags.length > 0 ? post.tags[0] : "etc";
   const postUrl = `/posts/${mainTag}/${post.slug}`;
-  const imagePath = `/api/og?title=${encodeURIComponent(post.title)}&tag=${encodeURIComponent(mainTag)}&date=${formattedDate.format("YYYY-MM-DD")}`;
+  const imagePath = `/api/og?title=${encodeURIComponent(post.title)}&tag=${encodeURIComponent(mainTag)}&date=${formattedDate.format("YYYY-MM-DD")}&v=3`;
 
   return (
     <Link

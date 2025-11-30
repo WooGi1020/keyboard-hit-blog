@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props) {
     title: post.title,
     description: post.description!,
     asPath: `/posts/${tag}/${slug}`,
-    ogImage: `/api/og?title=${encodeURIComponent(post.title)}&tag=${encodeURIComponent(tag)}&date=${formattedDate.format("YYYY-MM-DD")}&v=2`,
+    ogImage: `/api/og?title=${encodeURIComponent(post.title)}&tag=${encodeURIComponent(tag)}&date=${formattedDate.format("YYYY-MM-DD")}&v=3`,
   });
 }
 
