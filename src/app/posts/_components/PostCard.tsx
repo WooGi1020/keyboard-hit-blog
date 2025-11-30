@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 import dayjs from "dayjs";
 import { Post } from "#site/content";
+import getImagePath from "@/utils/getImagePath";
 
 interface PostCardProps {
   post: Post;
@@ -15,7 +16,7 @@ function PostCard({ post }: PostCardProps) {
 
   const mainTag = post.tags && post.tags.length > 0 ? post.tags[0] : "etc";
   const postUrl = `/posts/${mainTag}/${post.slug}`;
-  const imagePath = `/api/og?title=${encodeURIComponent(post.title)}&tag=${encodeURIComponent(mainTag)}&date=${formattedDate.format("YYYY-MM-DD")}&v=3`;
+  const imagePath = getImagePath(post.title, mainTag, formattedDate);
 
   return (
     <Link

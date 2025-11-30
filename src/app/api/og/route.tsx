@@ -122,7 +122,6 @@ export async function GET(request: Request) {
                 backgroundColor: "#38bdf8",
                 marginLeft: "12px",
                 marginBottom: "-6px",
-                boxShadow: "0 0 10px #38bdf8",
               }}
             />
           </div>

@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import { JetBrains_Mono } from "next/font/google";
 import Header from "@/components/header/Header";
 import { ThemeProvider } from "@/components/themes/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "sonner";
 import Footer from "@/components/footer/Footer";
 import type { Metadata } from "next";
 import META_DATA from "@/constant/META_DATA";

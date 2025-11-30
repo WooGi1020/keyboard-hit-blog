@@ -6,6 +6,7 @@ import PostContent from "@/app/posts/[tag]/[slug]/_components/PostContent";
 import Giscus from "@/components/giscus/Giscus";
 import LottieMonitor from "@/components/animation/lottieMonitor";
 import dayjs from "dayjs";
+import getImagePath from "@/utils/getImagePath";
 
 interface Params {
   tag: string;
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: Props) {
     title: post.title,
     description: post.description!,
     asPath: `/posts/${tag}/${slug}`,
-    ogImage: `/api/og?title=${encodeURIComponent(post.title)}&tag=${encodeURIComponent(tag)}&date=${formattedDate.format("YYYY-MM-DD")}&v=3`,
+    ogImage: getImagePath(post.title, tag, formattedDate),
   });
 }
 
@@ -61,10 +62,10 @@ async function PostPage({ params }: Props) {
 
   if (!post) return notFound();
 
-  const imagePath = `/api/og?title=${encodeURIComponent(post.title)}&tag=${encodeURIComponent(tag)}&date=${formattedDate.format("YYYY-MM-DD")}`;
+  const imagePath = getImagePath(post.title, tag, formattedDate);
 
   return (
-    <section className="flex flex-col gap-6 w-full max-w-[900px] mx-auto">
+    <section className="flex flex-col gap-6 w-full max-w-[800px] mx-auto">
       <div className="min-h-20 mx-auto max-sm:-mb-4">
         <LottieMonitor className="lottie-animation mx-auto relative bottom-5" />
       </div>

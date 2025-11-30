@@ -69,7 +69,7 @@ function CustomP({ children, ...props }: ParaProps) {
 function CustomBlockquote({ children, ...props }: BlockquoteProps) {
   return (
     <blockquote
-      className="my-6 border-l-4 border-blue-500 pl-6  italic bg-muted/30 rounded-r-md text-muted-foreground"
+      className="my-6 border-l-4 border-blue-500 pl-6 py-2 italic dark:bg-muted/30 bg-slate-100 rounded-r-md text-muted-foreground"
       {...props}
     >
       {children}
