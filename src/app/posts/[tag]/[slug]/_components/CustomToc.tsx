@@ -19,7 +19,7 @@ function CustomToc() {
   const [activeId, setActiveId] = useState<string>("");
   const router = useRouter();
 
-  const handleClickBack = () => router.push("/");
+  const handleClickBack = () => router.back();
 
   const handleClickCopy = async () => {
     try {

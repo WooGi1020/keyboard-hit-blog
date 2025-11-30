@@ -37,7 +37,6 @@ export async function GET(request: Request) {
           }}
         >
           <div style={{ display: "flex", gap: "14px" }}>
-            {/* 창 조절 버튼: 채도를 살짝 낮춰서 덜 튀게 조정 */}
             <div
               style={{ width: 18, height: 18, borderRadius: "50%", backgroundColor: "#ef4444" }}
             />
@@ -81,9 +80,8 @@ export async function GET(request: Request) {
           }}
         >
           <div style={{ display: "flex", gap: "16px", color: "#c084fc" }}>
-            {" "}
-            const <span style={{ color: "#fcd34d" }}>Title</span> = {/* Amber-300 */}
-            <span style={{ color: "#e2e8f0" }}>{`() => (`}</span>
+            const <span style={{ color: "#fcd34d" }}>Post</span>
+            <span style={{ color: "#e2e8f0" }}>{`= () => (`}</span>
           </div>
 
           <div
@@ -106,7 +104,7 @@ export async function GET(request: Request) {
                 textShadow: "0 2px 10px rgba(56, 189, 248, 0.2)",
               }}
             >
-              "{title}"
+              <span style={{ color: "#c084fc" }}>return</span> "{title}";
             </span>
           </div>
 

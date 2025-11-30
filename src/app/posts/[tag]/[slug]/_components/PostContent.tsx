@@ -2,6 +2,7 @@ import * as runtime from "react/jsx-runtime";
 import Image from "next/image";
 import components from "./MarkdownComponent";
 import CustomToc from "./CustomToc";
+import PostThumbnail from "./PostThumbnail";
 
 const useMDX = (code: string) => {
   const fn = new Function(code);
@@ -18,16 +19,7 @@ function PostContent({ code, imagePath }: PostContentProps) {
 
   return (
     <article className="relative w-full max-w-[900px] mx-auto">
-      <div className="relative w-full aspect-21/9 mb-10 overflow-hidden">
-        <Image
-          src={imagePath}
-          alt="포스트 썸네일 이미지"
-          fill
-          unoptimized
-          priority
-          className="object-contain"
-        />
-      </div>
+      <PostThumbnail imagePath={imagePath} />
       <CustomToc />
       <div className="prose dark:prose-invert max-w-none">
         <Component components={components} />

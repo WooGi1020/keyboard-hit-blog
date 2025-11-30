@@ -180,7 +180,7 @@ function CustomCode({ children, className, ...props }: CodeProps) {
   if (!isBlock) {
     return (
       <code
-        className="relative mx-1 rounded-md border border-zinc-300 bg-zinc-200 px-2 pb-0.5 font-mono text-[1rem] font-medium text-rose-600 dark:border-zinc-700/50 dark:bg-zinc-800 dark:text-rose-400 before:content-none after:content-none"
+        className="relative mx-1 rounded-md border border-zinc-300 bg-zinc-200 px-2 pb-0.5 text-[1rem] font-medium text-rose-600 dark:border-zinc-700/50 dark:bg-zinc-800 dark:text-rose-400 before:content-none after:content-none"
         {...props}
       >
         {children}
@@ -189,7 +189,7 @@ function CustomCode({ children, className, ...props }: CodeProps) {
   }
 
   return (
-    <code className="p-4 font-mono rounded" {...props}>
+    <code className="p-4 rounded" {...props}>
       {children}
     </code>
   );

@@ -6,11 +6,21 @@ import { Check, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-type CustomPreProps = React.ComponentPropsWithoutRef<"pre">;
+type CustomPreProps = React.ComponentPropsWithoutRef<"pre"> & {
+  "data-language"?: string;
+};
 
-function CustomPre({ children, className, style, ...props }: CustomPreProps) {
+function CustomPre({
+  children,
+  className,
+  style,
+  "data-language": dataLanguage,
+  ...props
+}: CustomPreProps) {
   const [isCopied, setIsCopied] = useState(false);
   const preRef = useRef<HTMLPreElement>(null);
+
+  const lang = dataLanguage || "text";
 
   const handleCopy = async () => {
     const code = preRef.current?.textContent;
@@ -28,12 +38,15 @@ function CustomPre({ children, className, style, ...props }: CustomPreProps) {
   };
 
   return (
-    <div className="relative my-6 overflow-hidden rounded-xl bg-slate-100 dark:bg-zinc-900 shadow-xl dark:border-zinc-800">
+    <div className="relative my-6 overflow-hidden rounded-xl bg-slate-100 dark:bg-zinc-900 shadow-xl dark:border-zinc-800 border border-slate-200">
       <div className="flex items-center justify-between bg-slate-200 dark:bg-[#282c34] px-4 py-3">
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <div className="size-3 rounded-full bg-[#ff5f56]" />
           <div className="size-3 rounded-full bg-[#ffbd2e]" />
           <div className="size-3 rounded-full bg-[#27c93f]" />
+          <span className="text-xs font-medium ml-2 text-zinc-500 dark:text-zinc-400 uppercase">
+            {lang}
+          </span>
         </div>
 
         <Button
@@ -50,10 +63,11 @@ function CustomPre({ children, className, style, ...props }: CustomPreProps) {
       <div className="relative w-full overflow-x-auto">
         <pre
           ref={preRef}
+          data-language={lang}
           {...props}
           style={{ ...style, backgroundColor: "transparent" }}
           className={cn(
-            "min-w-full text-sm font-mono leading-relaxed focus:outline-none",
+            "min-w-full text-sm leading-relaxed focus:outline-none p-4 font-mono",
             "bg-transparent m-0 border-0",
             className
           )}

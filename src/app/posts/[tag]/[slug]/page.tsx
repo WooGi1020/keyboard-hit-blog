@@ -17,11 +17,8 @@ type Props = {
   params: Promise<Params>;
 };
 
-// 1. 메타데이터 생성
 export async function generateMetadata({ params }: Props) {
   const { tag, slug } = await params;
-
-  // Velite 데이터는 메모리에 로드되므로 동기적으로 검색
   const post = posts.find((p) => p.slug === slug && p.tags.includes(tag));
   const formattedDate = dayjs(post!.date);
 
@@ -41,9 +38,7 @@ export async function generateMetadata({ params }: Props) {
   });
 }
 
-// 2. 정적 경로 생성 (SSG)
 export async function generateStaticParams() {
-  // 모든 태그-슬러그 조합에 대해 정적 페이지 생성
   return posts.flatMap((post) =>
     post.tags.map((tag) => ({
       tag: tag,
@@ -52,7 +47,6 @@ export async function generateStaticParams() {
   );
 }
 
-// 3. 페이지 컴포넌트
 async function PostPage({ params }: Props) {
   const resolvedParams = await params;
   const { tag, slug } = resolvedParams;
@@ -69,15 +63,9 @@ async function PostPage({ params }: Props) {
       <div className="min-h-20 mx-auto max-sm:-mb-4">
         <LottieMonitor className="lottie-animation mx-auto relative bottom-5" />
       </div>
-
-      {/* PostMeta는 tag, slug를 직접 받도록 설계되었습니다 (이전 대화 기반) */}
       <PostMeta tag={tag} slug={slug} />
-
       <div className="border dark:border-gray-500 border-gray-400 -mt-5" />
-
-      {/* ✅ 수정 핵심: PostContent 인터페이스에 맞춰 'code'로 전달 */}
       <PostContent code={post.code} imagePath={imagePath} />
-
       <Giscus />
     </section>
   );

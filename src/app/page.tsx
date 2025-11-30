@@ -18,7 +18,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="min-h-20 mx-auto">
+      <div className="mx-auto">
         <LottieKeyboard className="lottie-animation relative bottom-8" />
       </div>
 
