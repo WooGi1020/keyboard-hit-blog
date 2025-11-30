@@ -8,8 +8,8 @@ export default function Giscus() {
   const { resolvedTheme } = useTheme();
 
   const theme = resolvedTheme === "dark" ? "dark_high_contrast" : "light_high_contrast";
-  const repoId = process.env.GISCUS_REPO_ID;
-  const categoryId = process.env.GISCUS_CATEGORY_ID;
+  const repoId = process.env.NEXT_PUBLIC_GISCUS_REPO_ID;
+  const categoryId = process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID;
 
   useEffect(() => {
     if (!ref.current || ref.current.hasChildNodes()) return;
