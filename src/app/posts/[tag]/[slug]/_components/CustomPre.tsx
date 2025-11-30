@@ -3,13 +3,12 @@
 import { Button } from "@/components/ui/button";
 import React, { useRef, useState } from "react";
 import { Check, Copy } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 type CustomPreProps = React.ComponentPropsWithoutRef<"pre">;
 
 function CustomPre({ children, className, style, ...props }: CustomPreProps) {
-  const { toast } = useToast();
   const [isCopied, setIsCopied] = useState(false);
   const preRef = useRef<HTMLPreElement>(null);
 
@@ -20,17 +19,17 @@ function CustomPre({ children, className, style, ...props }: CustomPreProps) {
       try {
         await navigator.clipboard.writeText(code);
         setIsCopied(true);
-        toast({ description: "클립보드에 복사되었습니다." });
+        toast.success("클립보드에 복사되었습니다.");
         setTimeout(() => setIsCopied(false), 2000);
       } catch {
-        toast({ variant: "destructive", description: "복사에 실패했습니다." });
+        toast.error("복사에 실패했습니다.");
       }
     }
   };
 
   return (
-    <div className="relative my-6 overflow-hidden rounded-xl border border-zinc-700 bg-[#282c34] shadow-xl dark:border-zinc-800">
-      <div className="flex items-center justify-between border-b border-white/10 bg-[#282c34] px-4 py-3">
+    <div className="relative my-6 overflow-hidden rounded-xl bg-slate-100 dark:bg-zinc-900 shadow-xl dark:border-zinc-800">
+      <div className="flex items-center justify-between bg-slate-200 dark:bg-[#282c34] px-4 py-3">
         <div className="flex gap-2">
           <div className="size-3 rounded-full bg-[#ff5f56]" />
           <div className="size-3 rounded-full bg-[#ffbd2e]" />
