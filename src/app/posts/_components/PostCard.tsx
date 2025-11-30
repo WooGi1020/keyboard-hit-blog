@@ -1,9 +1,10 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 import dayjs from "dayjs";
 import { Post } from "#site/content";
-import { IDE_BLUR_DATA_URL } from "@/constant/BLUR_IMAGE";
 
 interface PostCardProps {
   post: Post;
@@ -19,16 +20,20 @@ function PostCard({ post }: PostCardProps) {
   return (
     <Link
       href={postUrl}
-      className="group flex flex-col h-full bg-background rounded-2xl overflow-hidden border border-input transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:shadow-black/3 dark:hover:shadow-white/3"
+      className="group flex flex-col h-full bg-background rounded-2xl overflow-hidden border border-input hover:-translate-y-1 hover:shadow-md hover:shadow-black/3 dark:hover:shadow-white/3 transition-transform duration-300"
     >
-      <div className="relative w-full aspect-16/10 overflow-hidden bottom-4.5">
+      <div
+        className="
+    relative w-full aspect-16/10 overflow-hidden bottom-4.5 flex items-center justify-center bg-linear-to-br from-slate-200 to-slate-200 dark:from-slate-700 dark:to-slate-900
+  "
+      >
         <Image
           src={imagePath}
           alt={post.title}
           fill
           priority
           unoptimized
-          className="object-contain transition-transform duration-500 group-hover:scale-105"
+          className="object-contain object-center transition-transform duration-300 group-hover:scale-105"
         />
       </div>
 
@@ -43,7 +48,7 @@ function PostCard({ post }: PostCardProps) {
           </div>
         </div>
 
-        <h2 className="text-lg font-bold leading-snug tracking-tight mb-2 sm:mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+        <h2 className="text-lg font-bold text-foreground leading-snug tracking-tight mb-2 sm:mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400">
           {post.title}
         </h2>
 

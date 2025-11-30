@@ -38,3 +38,6 @@ next-env.d.ts
 
 # mdx 빌드 결과물
 .velite
+
+# 스니펫
+*.code-snippets
