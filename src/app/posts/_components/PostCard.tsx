@@ -6,17 +6,19 @@ import { Calendar, Clock, ArrowRight } from "lucide-react";
 import dayjs from "dayjs";
 import { Post } from "#site/content";
 import getImagePath from "@/utils/getImagePath";
+import { useState } from "react";
 
 interface PostCardProps {
   post: Post;
 }
 
 function PostCard({ post }: PostCardProps) {
+  const [isLoading, setIsLoading] = useState(true);
   const formattedDate = dayjs(post.date);
 
   const mainTag = post.tags && post.tags.length > 0 ? post.tags[0] : "etc";
   const postUrl = `/posts/${mainTag}/${post.slug}`;
-  const imagePath = getImagePath(post.title, mainTag, formattedDate);
+  const imagePath = getImagePath(post.title, mainTag, formattedDate, "small");
 
   return (
     <Link
@@ -28,13 +30,18 @@ function PostCard({ post }: PostCardProps) {
     relative w-full aspect-16/10 overflow-hidden bottom-4.5 flex items-center justify-center bg-linear-to-br from-slate-200 to-slate-200 dark:from-slate-700 dark:to-slate-900
   "
       >
+        {isLoading && (
+          <div className="size-10 rounded-full border-t-2 border-chart-1 animate-spin" />
+        )}
         <Image
           src={imagePath}
           alt={post.title}
           fill
           priority
+          fetchPriority="high"
           unoptimized
           className="object-contain object-center transition-transform duration-300 group-hover:scale-105"
+          onLoadingComplete={() => setIsLoading(false)}
         />
       </div>
 

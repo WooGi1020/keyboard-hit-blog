@@ -17,7 +17,8 @@ export default function PostThumbnail({ imagePath }: { imagePath: string }) {
         fill
         unoptimized
         priority
-        onLoad={() => setIsLoading(false)}
+        fetchPriority="high"
+        onLoadingComplete={() => setIsLoading(false)}
         className={cn(
           "object-contain object-center transition-all duration-500 scale-110",
           "group-hover:scale-105",

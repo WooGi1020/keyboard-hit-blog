@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props) {
     title: post.title,
     description: post.description!,
     asPath: `/posts/${tag}/${slug}`,
-    ogImage: getImagePath(post.title, tag, formattedDate),
+    ogImage: getImagePath(post.title, tag, formattedDate, "large"),
   });
 }
 
@@ -56,7 +56,7 @@ async function PostPage({ params }: Props) {
 
   if (!post) return notFound();
 
-  const imagePath = getImagePath(post.title, tag, formattedDate);
+  const imagePath = getImagePath(post.title, tag, formattedDate, "small");
 
   return (
     <section className="flex flex-col gap-6 w-full max-w-[800px] mx-auto">
