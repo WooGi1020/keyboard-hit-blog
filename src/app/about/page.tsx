@@ -2,10 +2,7 @@ import { AboutHistory, AboutMeta, AboutOpinion, AboutProject } from "@/app/about
 
 function AboutPage() {
   return (
-    <div className="flex flex-col gap-11 w-full post">
-      <h2 className="text-center text-3xl font-bold text-animation -mb-5 max-sm:text-2xl">
-        반갑습니다! 😊
-      </h2>
+    <div className="flex flex-col gap-11 w-full mt-10">
       <AboutMeta />
       <AboutOpinion />
       <AboutProject />
