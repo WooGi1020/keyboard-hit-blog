@@ -67,7 +67,7 @@ function CustomPre({
           {...props}
           style={{ ...style, backgroundColor: "transparent" }}
           className={cn(
-            "min-w-full text-sm leading-relaxed focus:outline-none p-4 font-mono",
+            "min-w-full text-sm leading-relaxed focus:outline-none p-4",
             "bg-transparent m-0 border-0",
             className
           )}

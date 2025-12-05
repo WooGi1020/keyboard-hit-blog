@@ -1,6 +1,8 @@
 import CustomPre from "@/app/posts/[tag]/[slug]/_components/CustomPre";
 import Link from "next/link";
+import Image from "next/image";
 import { ComponentPropsWithoutRef } from "react";
+import { StaticImageData, StaticImport } from "next/dist/shared/lib/get-img-props";
 
 type AnchorProps = ComponentPropsWithoutRef<"a">;
 type ImgProps = ComponentPropsWithoutRef<"img">;
@@ -160,15 +162,36 @@ function CustomLink({ href, children, ...props }: AnchorProps) {
   );
 }
 
-function CustomImg({ src, alt, ...props }: ImgProps) {
+function CustomImg({ src, alt, width, height, ...props }: ImgProps) {
+  if (typeof src !== "string") {
+    return (
+      <div className="relative mx-auto my-8 h-80 max-w-full">
+        <Image
+          src={src as unknown as StaticImageData}
+          alt={alt || "content image"}
+          layout="fill"
+          objectFit="contain"
+          {...props}
+        />
+      </div>
+    );
+  }
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={src}
-      alt={alt || "content image"}
-      className="mx-auto my-8 h-auto max-w-full rounded-xl border border-zinc-200 shadow-lg dark:border-zinc-800"
-      {...props}
-    />
+    <>
+      <div
+        className="relative mx-auto mt-8 mb-2 aspect-video w-full max-w-full rounded-2xl overflow-hidden"
+        style={{ width, height }}
+      >
+        <Image
+          src={src as string | StaticImport}
+          alt={alt || "content image"}
+          layout="fill"
+          objectFit="contain"
+          {...props}
+        />
+      </div>
+      <p className="text-center text-sm mb-8 text-muted-foreground">{alt}</p>
+    </>
   );
 }
 

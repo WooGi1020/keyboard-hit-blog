@@ -14,14 +14,14 @@ export default function PostThumbnail({ imagePath }: { imagePath: string }) {
       <Image
         src={imagePath}
         alt="포스트 썸네일 이미지"
-        fill
+        layout="fill"
         unoptimized
         priority
         fetchPriority="high"
+        objectFit="contain"
         onLoadingComplete={() => setIsLoading(false)}
         className={cn(
-          "object-contain object-center transition-all duration-500 scale-110",
-          "group-hover:scale-105",
+          "transition-all duration-500",
           isLoading ? "opacity-0 blur-sm" : "opacity-100 blur-0"
         )}
       />

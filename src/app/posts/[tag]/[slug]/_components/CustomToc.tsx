@@ -61,7 +61,9 @@ function CustomToc() {
       { rootMargin: "0px 0px -70% 0px" }
     );
 
-    document.querySelectorAll("article h1, article h2").forEach((el) => observer.observe(el));
+    document
+      .querySelectorAll("article div h1, article div h2")
+      .forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
