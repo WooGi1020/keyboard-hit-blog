@@ -4,6 +4,7 @@ import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
+import rehypeUnwrapImages from "rehype-unwrap-images";
 import { defineConfig, defineCollection, s } from "velite";
 
 // 1. Post 컬렉션(스키마) 정의
@@ -54,6 +55,7 @@ export default defineConfig({
     remarkPlugins: [remarkGfm, remarkBreaks],
     rehypePlugins: [
       rehypeSlug,
+      rehypeUnwrapImages,
       [
         rehypePrettyCode,
         {
