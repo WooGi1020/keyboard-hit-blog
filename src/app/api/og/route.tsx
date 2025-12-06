@@ -10,18 +10,26 @@ export async function GET(request: Request) {
   const tag = searchParams.get("tag") || "etc";
   const date = searchParams.get("date") || new Date().toISOString().split("T")[0];
 
+  // 🚨 폰트 크기 및 여백을 추가적으로 대폭 축소
   const config = {
     width: 366,
     height: 192,
-    paddingHeader: "12px 16px",
-    paddingBody: "24px 28px",
-    fontSizeTag: 15,
-    fontSizeCode: 17,
-    gapHeader: 8,
-    dotSize: 10,
-    borderRadiusOuter: "12px",
-    borderRadiusTag: "4px",
-    marginTop: "30px",
+    paddingHeader: "6px 8px", // 헤더 패딩 최소화
+    paddingBody: "10px 14px", // 본문 패딩 최소화
+    fontSizeTag: 10, // 태그 폰트 크기 추가 축소
+    fontSizeCode: 10, // 코드 폰트 크기 추가 축소
+    gapHeader: 5, // 헤더 아이콘 간격 최소화
+    dotSize: 6, // 헤더 점 크기 최소화
+    borderRadiusOuter: "6px", // 외부 모서리 둥글기 추가 축소
+    borderRadiusTag: "2px", // 태그 모서리 둥글기 최소화
+    marginTop: "15px", // 외부 마진 최소화
+
+    // 내부 폰트 크기 및 여백 재조정
+    codeMarginTop: "5px", // 내부 여백 축소
+    codeMarginLeft: "12px", // 들여쓰기 축소
+    codeTitleMarginTop: "3px",
+    codeTitleFontSize: 12, // 타이틀 윗줄 폰트 축소
+    titleFontSizeAdjustment: 4, // 타이틀 최종 폰트 크기 조정 (+2에서 +4로)
   };
 
   return new ImageResponse(
@@ -36,8 +44,7 @@ export async function GET(request: Request) {
           marginTop: config.marginTop,
           backgroundColor: "#1e293b",
           borderRadius: config.borderRadiusOuter,
-          // 조건부 boxShadow 제거, small 버전 값 사용
-          boxShadow: "0px 4px 12px -2px rgba(0, 0, 0, 0.3)",
+          boxShadow: "0px 1px 4px -1px rgba(0, 0, 0, 0.3)", // 그림자 더 약화
           overflow: "hidden",
         }}
       >
@@ -47,11 +54,11 @@ export async function GET(request: Request) {
             alignItems: "center",
             justifyContent: "space-between",
             padding: config.paddingHeader,
-            // 조건부 borderBottom 제거, small 버전 값 사용
             borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
             backgroundColor: "#0f172a",
           }}
         >
+          {/* 헤더 점들 */}
           <div style={{ display: "flex", gap: `${config.gapHeader}px` }}>
             <div
               style={{
@@ -79,6 +86,7 @@ export async function GET(request: Request) {
             />
           </div>
 
+          {/* 태그 영역 */}
           <div
             style={{
               fontSize: config.fontSizeTag,
@@ -86,11 +94,9 @@ export async function GET(request: Request) {
               fontWeight: "600",
               display: "flex",
               alignItems: "center",
-              // 조건부 gap 제거, small 버전 값 사용
-              gap: "4px",
+              gap: "2px", // 간격 최소화
               backgroundColor: "rgba(255, 255, 255, 0.1)",
-              // 조건부 padding 제거, small 버전 값 사용
-              padding: "4px 10px",
+              padding: "2px 6px", // 패딩 최소화
               borderRadius: config.borderRadiusTag,
             }}
           >
@@ -98,6 +104,7 @@ export async function GET(request: Request) {
           </div>
         </div>
 
+        {/* 코드 본문 */}
         <div
           style={{
             display: "flex",
@@ -106,13 +113,20 @@ export async function GET(request: Request) {
             flexGrow: 1,
             color: "#e2e8f0",
             fontSize: config.fontSizeCode,
-            lineHeight: 1.4,
+            lineHeight: 1.3, // 라인 높이 약간 축소
             whiteSpace: "pre-wrap",
             fontFamily: "monospace",
           }}
         >
-          {/* 조건부 gap 제거, small 버전 값 사용 */}
-          <div style={{ display: "flex", gap: "8px", color: "#c084fc" }}>
+          {/* const Post = () => ( */}
+          <div
+            style={{
+              display: "flex",
+              gap: "5px",
+              color: "#c084fc",
+              fontSize: config.fontSizeCode,
+            }}
+          >
             const <span style={{ color: "#fcd34d" }}>Post</span>
             <span style={{ color: "#e2e8f0" }}>{`= () => (`}</span>
           </div>
@@ -121,36 +135,36 @@ export async function GET(request: Request) {
             style={{
               display: "flex",
               flexDirection: "column",
-              // 조건부 marginTop 제거, small 버전 값 사용
-              marginTop: "12px",
-              // 조건부 marginLeft 제거, small 버전 값 사용
-              marginLeft: "24px",
+              marginTop: config.codeMarginTop,
+              marginLeft: config.codeMarginLeft,
             }}
           >
-            <span style={{ color: "#94a3b8", fontSize: config.fontSizeCode }}>{`// ${date}`}</span>
+            {/* 날짜 주석 */}
+            <span
+              style={{ color: "#94a3b8", fontSize: config.fontSizeCode }} // 주석 폰트도 코드 폰트와 동일하게
+            >{`// ${date}`}</span>
 
+            {/* 타이틀 */}
             <span
               style={{
                 color: "#38bdf8",
                 fontWeight: "bold",
                 fontSize: config.fontSizeCode,
-                // 조건부 marginTop 제거, small 버전 값 사용
-                marginTop: "6px",
-                lineHeight: 1.2,
-                // 조건부 textShadow 제거, small 버전 값 사용
-                textShadow: "0 1px 5px rgba(56, 189, 248, 0.2)",
+                marginTop: "3px", // 마진 축소
+                lineHeight: 1.1,
+                textShadow: "0 1px 2px rgba(56, 189, 248, 0.1)",
               }}
             >
               <span style={{ color: "#c084fc" }}>return</span> "{title}";
             </span>
           </div>
 
+          {/* ); 및 커서 */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              // 조건부 marginTop 제거, small 버전 값 사용
-              marginTop: "16px",
+              marginTop: "5px", // 여백 축소
               color: "#e2e8f0",
             }}
           >
@@ -158,13 +172,11 @@ export async function GET(request: Request) {
             <div
               style={{
                 display: "flex",
-                // 조건부 width/height 제거, small 버전 값 사용
-                width: "2px",
-                height: "24px",
+                width: "1.5px",
+                height: "12px", // 커서 높이 추가 축소
                 backgroundColor: "#38bdf8",
-                // 조건부 marginLeft/marginBottom 제거, small 버전 값 사용
-                marginLeft: "6px",
-                marginBottom: "-3px",
+                marginLeft: "3px", // 커서 마진 축소
+                marginBottom: "-1px",
               }}
             />
           </div>

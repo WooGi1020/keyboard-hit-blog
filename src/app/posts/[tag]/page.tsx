@@ -36,8 +36,9 @@ export async function generateMetadata({ params }: Props) {
 }
 
 async function PostsPage({ params }: Props) {
-  const { tag } = params;
+  const { tag } = await params;
   const decodedTag = decodeURIComponent(tag);
+  console.log(decodedTag);
 
   const { tagInfos, allTagCount } = getTagData();
   const postMetaData: ReturnType<typeof getPostMetaData> = getPostMetaData(); // 가벼운 데이터 로드
