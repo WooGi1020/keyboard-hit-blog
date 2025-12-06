@@ -4,12 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 import dayjs from "dayjs";
-import { Post } from "#site/content";
 import getImagePath from "@/utils/getImagePath";
 import { useState } from "react";
+import { getPostMetaData } from "@/utils/getPostMetadata";
+
+type ArrayElement<A> = A extends readonly (infer T)[] ? T : never;
+
+type PostMetaData = ArrayElement<ReturnType<typeof getPostMetaData>>;
 
 interface PostCardProps {
-  post: Post;
+  post: PostMetaData;
 }
 
 function PostCard({ post }: PostCardProps) {
