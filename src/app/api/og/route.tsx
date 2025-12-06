@@ -11,8 +11,8 @@ export async function GET(request: Request) {
   const date = searchParams.get("date") || new Date().toISOString().split("T")[0];
 
   const config = {
-    width: 653,
-    height: 343,
+    width: 366,
+    height: 192,
     paddingHeader: "12px 16px",
     paddingBody: "24px 28px",
     fontSizeTag: 15,
