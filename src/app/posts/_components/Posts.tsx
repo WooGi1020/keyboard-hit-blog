@@ -8,7 +8,7 @@ interface PostsProps {
 }
 
 function Posts({ tag, posts }: PostsProps) {
-  let filteredPosts = posts; // prop으로 받은 데이터 사용
+  let filteredPosts = posts;
 
   if (tag && tag !== "all") {
     filteredPosts = filteredPosts.filter((post) => post.tags.includes(tag));
