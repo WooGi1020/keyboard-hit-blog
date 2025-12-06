@@ -1,10 +1,9 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
-import React, { useRef, useState } from "react";
-import { Check, Copy } from "lucide-react";
-import { toast } from "sonner";
+import React from "react";
 import { cn } from "@/lib/utils";
+import CustomCopyButton from "./CustomCopyButton";
+
+const ACCENT_COLOR_LIGHT = "hsl(45, 100%, 70%)";
+const ACCENT_COLOR_DARK = "hsl(45, 100%, 75%)";
 
 type CustomPreProps = React.ComponentPropsWithoutRef<"pre"> & {
   "data-language"?: string;
@@ -17,25 +16,33 @@ function CustomPre({
   "data-language": dataLanguage,
   ...props
 }: CustomPreProps) {
-  const [isCopied, setIsCopied] = useState(false);
-  const preRef = useRef<HTMLPreElement>(null);
-
+  const isFind = dataLanguage && dataLanguage === "find";
   const lang = dataLanguage || "text";
 
-  const handleCopy = async () => {
-    const code = preRef.current?.textContent;
+  if (isFind) {
+    return (
+      <pre
+        className={`
+        my-6 pl-10 pr-4 rounded-lg relative overflow-hidden text-sm
+        bg-orange-100 text-orange-800 
+        dark:bg-blue-950 dark:text-blue-300
+      `}
+        {...props}
+      >
+        <span
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-2xl select-none"
+          style={{
+            color: "rgb(251 191 36)",
+            filter: `drop-shadow(0 0 4px ${className?.includes("dark") ? ACCENT_COLOR_DARK : ACCENT_COLOR_LIGHT})`,
+          }}
+        >
+          💡
+        </span>
 
-    if (code) {
-      try {
-        await navigator.clipboard.writeText(code);
-        setIsCopied(true);
-        toast.success("클립보드에 복사되었습니다.");
-        setTimeout(() => setIsCopied(false), 2000);
-      } catch {
-        toast.error("복사에 실패했습니다.");
-      }
-    }
-  };
+        <code className="block whitespace-pre-wrap">{children}</code>
+      </pre>
+    );
+  }
 
   return (
     <div className="relative my-6 overflow-hidden rounded-xl bg-slate-100 dark:bg-zinc-900 shadow-xl dark:border-zinc-800 border border-slate-200">
@@ -49,20 +56,11 @@ function CustomPre({
           </span>
         </div>
 
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleCopy}
-          className="size-6 text-zinc-400 hover:bg-white/10 hover:text-zinc-100 transition-colors"
-          aria-label="코드 복사"
-        >
-          {isCopied ? <Check className="size-3.5 text-green-400" /> : <Copy className="size-3.5" />}
-        </Button>
+        <CustomCopyButton codeChildren={children} />
       </div>
 
       <div className="relative w-full overflow-x-auto">
         <pre
-          ref={preRef}
           data-language={lang}
           {...props}
           style={{ ...style, backgroundColor: "transparent" }}
