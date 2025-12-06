@@ -1,8 +1,10 @@
 import { TagNav } from "@/app/posts/[tag]/(tagNav)/TagNav";
 import Posts from "@/app/posts/_components/Posts";
-import LottieKeyboard from "@/components/animation/lottieKeyboard";
 import { getMetaData } from "@/utils/getMetaData";
+import { getPostMetaData } from "@/utils/getPostMetadata";
 import { getTagData } from "@/utils/tagUtil";
+
+import { LazyLoadLottieKeyboard } from "@/components/lazy/LazyWrapper";
 
 export async function generateMetadata() {
   return getMetaData({
@@ -14,15 +16,16 @@ export async function generateMetadata() {
 
 export default function Home() {
   const { tagInfos, allTagCount } = getTagData();
+  const postMetaData: ReturnType<typeof getPostMetaData> = getPostMetaData();
 
   return (
     <>
       <div className="mx-auto">
-        <LottieKeyboard className="lottie-animation relative bottom-8" />
+        <LazyLoadLottieKeyboard />
       </div>
 
       <TagNav tagInfos={tagInfos} allTagCount={allTagCount} />
-      <Posts />
+      <Posts tag="all" posts={postMetaData} />
     </>
   );
 }

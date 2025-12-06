@@ -1,16 +1,17 @@
-import { posts } from "#site/content";
 import PostCard from "@/app/posts/_components/PostCard";
 import { notFound } from "next/navigation";
+import { getPostMetaData } from "@/utils/getPostMetadata";
 
 interface PostsProps {
   tag?: string;
+  posts: ReturnType<typeof getPostMetaData>; // Prop으로 데이터 받기
 }
 
-function Posts({ tag }: PostsProps) {
-  let filteredPosts = posts;
+function Posts({ tag, posts }: PostsProps) {
+  let filteredPosts = posts; // prop으로 받은 데이터 사용
 
   if (tag && tag !== "all") {
-    filteredPosts = posts.filter((post) => post.tags.includes(tag));
+    filteredPosts = filteredPosts.filter((post) => post.tags.includes(tag));
   }
 
   filteredPosts = [...filteredPosts].sort(

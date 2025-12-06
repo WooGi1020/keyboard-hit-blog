@@ -1,17 +1,18 @@
-import { posts } from "#site/content";
 import { TagNav } from "@/app/posts/[tag]/(tagNav)/TagNav";
 import Posts from "@/app/posts/_components/Posts";
 import { getMetaData } from "@/utils/getMetaData";
-import LottieKeyboard from "@/components/animation/lottieKeyboard";
-import { notFound } from "next/navigation";
 import { getTagData } from "@/utils/tagUtil";
+import { getPostMetaData } from "@/utils/getPostMetadata";
+
+import { LazyLoadLottieKeyboard } from "@/components/lazy/LazyWrapper";
 
 type Props = {
-  params: Promise<{ tag: string }>;
+  params: { tag: string };
 };
 
 export async function generateStaticParams() {
-  const tags = new Set(posts.flatMap((post) => post.tags));
+  const postMetaData = getPostMetaData();
+  const tags = new Set(postMetaData.flatMap((post) => post.tags));
 
   const paths = Array.from(tags).map((tag) => ({
     tag: tag,
@@ -23,7 +24,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const { tag } = await params;
+  const { tag } = params;
   const decodedTag = decodeURIComponent(tag);
 
   return getMetaData({
@@ -35,25 +36,21 @@ export async function generateMetadata({ params }: Props) {
 }
 
 async function PostsPage({ params }: Props) {
-  const { tag } = await params;
+  const { tag } = params;
   const decodedTag = decodeURIComponent(tag);
 
   const { tagInfos, allTagCount } = getTagData();
+  const postMetaData: ReturnType<typeof getPostMetaData> = getPostMetaData(); // 가벼운 데이터 로드
 
-  const isValidTag = tagInfos.some((t) => t.tag === decodedTag);
-
-  if (!isValidTag) {
-    return notFound();
-  }
+  const isValidTag = decodedTag === "all" || tagInfos.some((t) => t.tag === decodedTag);
 
   return (
     <>
       <div className="min-h-20 mx-auto">
-        <LottieKeyboard className="lottie-animation relative bottom-8" />
+        <LazyLoadLottieKeyboard />
       </div>
-
       <TagNav tagInfos={tagInfos} allTagCount={allTagCount} />
-      <Posts tag={decodedTag} />
+      <Posts tag={decodedTag} posts={postMetaData} /> {/* 데이터를 prop으로 주입 */}
     </>
   );
 }

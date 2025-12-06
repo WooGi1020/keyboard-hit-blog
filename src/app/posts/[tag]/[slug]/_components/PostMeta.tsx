@@ -1,4 +1,4 @@
-import { posts } from "#site/content"; // .velite에서 생성된 데이터
+import { posts } from "#site/content";
 import dayjs from "dayjs";
 import { Calendar, Clock } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -16,7 +16,7 @@ function PostMeta({ tag, slug }: PostMetaProps) {
   const formattedDate = dayjs(post.date);
 
   return (
-    <div className="max-w-[800px] w-full mx-auto p-4">
+    <div className="w-full mx-auto p-4">
       <div className="w-full mb-6">
         <p className="text-md text-chart-1 mb-2 text-center">{tag}</p>
         <h1 className="text-4xl font-bold text-chart-2 mb-4 text-center max-sm:text-3xl">
