@@ -18,7 +18,7 @@ function PostCard({ post }: PostCardProps) {
 
   const mainTag = post.tags && post.tags.length > 0 ? post.tags[0] : "etc";
   const postUrl = `/posts/${mainTag}/${post.slug}`;
-  const imagePath = getImagePath(post.title, mainTag, formattedDate, "small");
+  const imagePath = getImagePath(post.title, mainTag, formattedDate);
 
   return (
     <Link
