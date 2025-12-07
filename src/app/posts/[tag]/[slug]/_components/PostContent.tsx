@@ -1,18 +1,13 @@
-import * as runtime from "react/jsx-runtime";
 import components from "./MarkdownComponent";
 import CustomToc from "./CustomToc";
-
-const useMDX = (code: string) => {
-  const fn = new Function(code);
-  return fn({ ...runtime }).default;
-};
+import parseMDX from "@/utils/parseMDX";
 
 interface PostContentProps {
   code: string;
 }
 
 function PostContent({ code }: PostContentProps) {
-  const Component = useMDX(code);
+  const Component = parseMDX(code);
 
   return (
     <article className="relative w-full max-w-[900px] mx-auto">

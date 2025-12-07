@@ -31,7 +31,7 @@ function CustomToc() {
   };
 
   const handleClickToComment = () => {
-    const commentSection = document.querySelector(".giscus");
+    const commentSection = document.getElementById("giscus-comment-box");
     if (commentSection) {
       commentSection.scrollIntoView({ behavior: "smooth" });
     } else {

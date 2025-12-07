@@ -2,8 +2,6 @@
 
 @variant dark (&:where(.dark, .dark *));
 
-@plugin "tailwindcss-animate";
-
 @theme {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -35,8 +33,6 @@
   --radius-sm: calc(var(--radius) - 4px);
 
   --animate-fall: fall 0.7s ease-in-out;
-  --animate-bounce: bounce 2s ease-in-out infinite;
-  --animate-show: show 0.7s ease;
 
   @keyframes fall {
     0% {
@@ -44,17 +40,6 @@
     }
     50% {
       transform: translateY(10px);
-    }
-    100% {
-      transform: translateY(0px);
-    }
-  }
-  @keyframes bounce {
-    0% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
     }
     100% {
       transform: translateY(0px);
@@ -130,7 +115,6 @@
   }
 
   html {
-    scroll-behavior: smooth;
     @apply bg-background text-foreground;
   }
 
@@ -140,34 +124,25 @@
 }
 
 /* 4. 유틸리티 레이어 */
-@utility main {
-  min-height: calc(100vh - 250px);
-}
 
-@utility ul-toc {
-  box-shadow:
-    0 5px 8px rgba(0, 0, 0, 0.05),
-    0 10px 15px rgba(0, 0, 0, 0.03);
-}
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-1.5 h-1.5 bg-transparent;
+  }
 
-@utility hover-card {
-  transform: translateY(-5px);
-  box-shadow:
-    0 7px 10px rgba(0, 0, 0, 0.08),
-    0 12px 18px rgba(0, 0, 0, 0.05);
-}
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
 
-@utility card {
-  transition: transform 0.5s ease;
-  box-shadow:
-    0 5px 8px rgba(0, 0, 0, 0.05),
-    0 10px 15px rgba(0, 0, 0, 0.03);
-}
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-gray-600 transition-colors hover:bg-gray-600 dark:bg-gray-400 dark:hover:bg-gray-500;
+  }
 
-@utility lottie-animation {
-  animation: fall 0.7s ease-in-out;
-}
+  .custom-scrollbar::-webkit-scrollbar-corner {
+    @apply bg-transparent;
+  }
 
-@utility text-animation {
-  animation: bounce 2s ease-in-out infinite;
+  .lottie-animation {
+    animation: fall 0.7s ease-in-out;
+  }
 }

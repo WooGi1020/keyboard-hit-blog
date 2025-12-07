@@ -1,7 +1,6 @@
-import { posts } from "#site/content"; // ✅ Velite 데이터 import
+import { posts } from "#site/content";
 import type { MetadataRoute } from "next";
 
-// 기본 사이트맵 설정
 const defaultSiteMaps: MetadataRoute.Sitemap = [
   {
     url: "https://keyboard-hit-blog.vercel.app",

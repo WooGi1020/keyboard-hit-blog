@@ -1,10 +1,10 @@
 import PostCard from "@/app/posts/_components/PostCard";
 import { notFound } from "next/navigation";
-import { getPostMetaData } from "@/utils/getPostMetadata";
+import { getPostMetaData } from "@/utils/tagUtil";
 
 interface PostsProps {
   tag?: string;
-  posts: ReturnType<typeof getPostMetaData>; // Prop으로 데이터 받기
+  posts: ReturnType<typeof getPostMetaData>;
 }
 
 function Posts({ tag, posts }: PostsProps) {

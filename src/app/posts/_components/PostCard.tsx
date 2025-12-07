@@ -6,7 +6,7 @@ import { Calendar, Clock, ArrowRight } from "lucide-react";
 import dayjs from "dayjs";
 import getImagePath from "@/utils/getImagePath";
 import { useState } from "react";
-import { getPostMetaData } from "@/utils/getPostMetadata";
+import { getPostMetaData } from "@/utils/tagUtil";
 
 type ArrayElement<A> = A extends readonly (infer T)[] ? T : never;
 

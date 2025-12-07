@@ -1,4 +1,6 @@
-import { posts } from "#site/content";
+import { Post, posts } from "#site/content";
+
+type PostMetaData = Omit<Post, "code">;
 
 export function getTagData() {
   const allTagCount = posts.length;
@@ -16,4 +18,8 @@ export function getTagData() {
   }));
 
   return { tagInfos, allTagCount };
+}
+
+export function getPostMetaData(): PostMetaData[] {
+  return posts.map(({ code, ...meta }) => meta);
 }

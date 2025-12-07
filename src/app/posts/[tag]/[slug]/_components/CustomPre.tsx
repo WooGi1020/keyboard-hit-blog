@@ -1,11 +1,11 @@
-import React from "react";
+import { ComponentPropsWithoutRef } from "react";
 import { cn } from "@/lib/utils";
 import CustomCopyButton from "./CustomCopyButton";
 
 const ACCENT_COLOR_LIGHT = "hsl(45, 100%, 70%)";
 const ACCENT_COLOR_DARK = "hsl(45, 100%, 75%)";
 
-type CustomPreProps = React.ComponentPropsWithoutRef<"pre"> & {
+type CustomPreProps = ComponentPropsWithoutRef<"pre"> & {
   "data-language"?: string;
 };
 
