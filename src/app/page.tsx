@@ -20,10 +20,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="mx-auto">
-        <LazyLoadLottieKeyboard />
-      </div>
-
+      <LazyLoadLottieKeyboard />
       <TagNav tagInfos={tagInfos} allTagCount={allTagCount} />
       <Posts tag="all" posts={postMetaData} />
     </>

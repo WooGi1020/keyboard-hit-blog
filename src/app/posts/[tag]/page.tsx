@@ -42,13 +42,9 @@ async function PostsPage({ params }: Props) {
   const { tagInfos, allTagCount } = getTagData();
   const postMetaData: ReturnType<typeof getPostMetaData> = getPostMetaData(); // 가벼운 데이터 로드
 
-  const isValidTag = decodedTag === "all" || tagInfos.some((t) => t.tag === decodedTag);
-
   return (
     <>
-      <div className="min-h-20 mx-auto">
-        <LazyLoadLottieKeyboard />
-      </div>
+      <LazyLoadLottieKeyboard />
       <TagNav tagInfos={tagInfos} allTagCount={allTagCount} />
       <Posts tag={decodedTag} posts={postMetaData} /> {/* 데이터를 prop으로 주입 */}
     </>

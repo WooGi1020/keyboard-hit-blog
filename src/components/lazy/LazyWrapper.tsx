@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 
 const LazyGiscus = dynamic(() => import("@/components/giscus/Giscus"), {
   ssr: false,
@@ -23,5 +24,11 @@ export function LazyLoadLottieMonitor() {
 }
 
 export function LazyLoadLottieKeyboard() {
-  return <LazyLottieKeyboard className="lottie-animation relative bottom-8" />;
+  const pathname = usePathname();
+
+  return (
+    <LazyLottieKeyboard
+      className={`${pathname === "/" ? "lottie-animation" : ""} absolute top-12 left-1/2 -translate-x-1/2`}
+    />
+  );
 }
