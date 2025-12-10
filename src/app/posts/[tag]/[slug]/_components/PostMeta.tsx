@@ -1,5 +1,5 @@
 import { posts } from "#site/content";
-import dayjs from "dayjs";
+import { getFormattedDate } from "@/utils/getDate";
 import { Calendar, Clock } from "lucide-react";
 import { notFound } from "next/navigation";
 
@@ -13,7 +13,10 @@ function PostMeta({ tag, slug }: PostMetaProps) {
 
   if (!post) return notFound();
 
-  const formattedDate = dayjs(post.date);
+  const formattedDate = getFormattedDate(
+    post.updatedDate ? post.updatedDate : post.createdDate,
+    "YYYY년 MM월 DD일"
+  );
 
   return (
     <div className="w-full mx-auto p-4">
@@ -29,7 +32,9 @@ function PostMeta({ tag, slug }: PostMetaProps) {
       <div className="flex max-w-[700px] mx-auto w-full justify-between items-center text-gray-600 text-sm">
         <div className="flex items-center gap-2">
           <Calendar className="size-4 dark:text-gray-400" />
-          <span className="dark:text-gray-400">{formattedDate.format("YYYY년 MM월 DD일")}</span>
+          <span className="dark:text-gray-400">
+            {post.updatedDate ? formattedDate + "에 수정됨" : formattedDate}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <Clock className="size-4 dark:text-gray-400" />

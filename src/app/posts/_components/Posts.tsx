@@ -15,7 +15,7 @@ function Posts({ tag, posts }: PostsProps) {
   }
 
   filteredPosts = [...filteredPosts].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()
   );
 
   if (filteredPosts.length === 0) {

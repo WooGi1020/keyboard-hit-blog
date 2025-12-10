@@ -2,10 +2,10 @@ import { posts } from "#site/content";
 import { getMetaData } from "@/utils/getMetaData";
 import PostMeta from "@/app/posts/[tag]/[slug]/_components/PostMeta";
 import PostContent from "@/app/posts/[tag]/[slug]/_components/PostContent";
-import dayjs from "dayjs";
 import getImagePath from "@/utils/getImagePath";
 
 import { LazyLoadLottieMonitor, LazyLoadGiscus } from "@/components/lazy/LazyWrapper";
+import { getFormattedDate } from "@/utils/getDate";
 
 interface Params {
   tag: string;
@@ -19,7 +19,7 @@ type Props = {
 export async function generateMetadata({ params }: Props) {
   const { tag, slug } = await params;
   const post = posts.find((p) => p.slug === slug && p.tags.includes(tag));
-  const formattedDate = dayjs(post!.date);
+  const formattedDate = getFormattedDate(post ? post.createdDate : "", "YYYY-MM-DD");
 
   if (!post) {
     return getMetaData({

@@ -3,10 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
-import dayjs from "dayjs";
 import getImagePath from "@/utils/getImagePath";
 import { useState } from "react";
 import { getPostMetaData } from "@/utils/tagUtil";
+import { getFormattedDate } from "@/utils/getDate";
 
 type ArrayElement<A> = A extends readonly (infer T)[] ? T : never;
 
@@ -18,7 +18,10 @@ interface PostCardProps {
 
 function PostCard({ post }: PostCardProps) {
   const [isLoading, setIsLoading] = useState(true);
-  const formattedDate = dayjs(post.date);
+  const formattedDate = getFormattedDate(
+    post.updatedDate ? post.updatedDate : post.createdDate,
+    "YYYY. MM. DD"
+  );
 
   const mainTag = post.tags && post.tags.length > 0 ? post.tags[0] : "etc";
   const postUrl = `/posts/${mainTag}/${post.slug}`;
@@ -71,7 +74,7 @@ function PostCard({ post }: PostCardProps) {
         <div className="flex items-center justify-between py-4 border-t border-border/50 mt-auto">
           <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-muted-foreground font-medium">
             <Calendar className="size-3 sm:size-3.5" />
-            <span>{formattedDate.format("YYYY. MM. DD")}</span>
+            <span>{formattedDate}</span>
           </div>
 
           <div className="flex items-center text-[10px] sm:text-xs font-semibold text-primary opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
