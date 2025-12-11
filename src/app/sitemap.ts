@@ -20,7 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const sitemapFromPosts: MetadataRoute.Sitemap = posts.flatMap((post) =>
     post.tags.map((tag) => ({
       url: `https://keyboard-hit-blog.vercel.app/posts/${tag}/${post.slug}`,
-      lastModified: new Date(post.date),
+      lastModified: new Date(post.createdDate),
       changeFrequency: "daily" as const, // 타입 안전성 확보
       priority: 0.7,
     }))
