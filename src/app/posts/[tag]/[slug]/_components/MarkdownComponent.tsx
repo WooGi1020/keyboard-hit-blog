@@ -163,33 +163,14 @@ function CustomLink({ href, children, ...props }: AnchorProps) {
 }
 
 function CustomImg({ src, alt, width, height, ...props }: ImgProps) {
-  const isWebp = typeof src === "string" && src.endsWith(".webp");
-  if (typeof src !== "string") {
-    return (
-      <div className="relative mx-auto my-8 h-80 max-w-full">
-        <Image
-          src={src as unknown as StaticImageData}
-          alt={alt || "content image"}
-          layout="fill"
-          objectFit="contain"
-          {...props}
-        />
-      </div>
-    );
-  }
+  const imgSrc: string | StaticImport = src as string | StaticImport;
   return (
     <>
       <div
         className="relative mx-auto mt-8 mb-2 aspect-video max-w-full rounded-2xl overflow-hidden"
         style={{ width, height }}
       >
-        <Image
-          src={src as string | StaticImport}
-          alt={alt || ""}
-          layout="fill"
-          objectFit="contain"
-          {...props}
-        />
+        <Image src={imgSrc} alt={alt || ""} layout="fill" priority objectFit="contain" {...props} />
       </div>
       <p className="text-center text-sm mb-8 text-muted-foreground">{alt}</p>
     </>
