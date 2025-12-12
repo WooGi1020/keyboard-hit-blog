@@ -24,7 +24,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const { tag } = params;
+  const { tag } = await params;
   const decodedTag = decodeURIComponent(tag);
 
   return getMetaData({
