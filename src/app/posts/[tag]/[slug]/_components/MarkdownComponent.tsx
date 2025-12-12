@@ -2,7 +2,7 @@ import CustomPre from "@/app/posts/[tag]/[slug]/_components/CustomPre";
 import Link from "next/link";
 import Image from "next/image";
 import { ComponentPropsWithoutRef } from "react";
-import { StaticImageData, StaticImport } from "next/dist/shared/lib/get-img-props";
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
 
 type AnchorProps = ComponentPropsWithoutRef<"a">;
 type ImgProps = ComponentPropsWithoutRef<"img">;
