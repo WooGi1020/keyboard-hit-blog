@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     paddingHeader: "6px 8px", // 헤더 패딩 최소화
     paddingBody: "10px 14px", // 본문 패딩 최소화
     fontSizeTag: 10, // 태그 폰트 크기 추가 축소
-    fontSizeCode: 11, // 코드 폰트 크기 추가 축소
+    fontSizeCode: 10, // 코드 폰트 크기 추가 축소
     gapHeader: 5, // 헤더 아이콘 간격 최소화
     dotSize: 6, // 헤더 점 크기 최소화
     borderRadiusOuter: "6px", // 외부 모서리 둥글기 추가 축소
