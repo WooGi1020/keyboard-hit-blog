@@ -13,10 +13,11 @@ function PostMeta({ tag, slug }: PostMetaProps) {
 
   if (!post) return notFound();
 
-  const formattedDate = getFormattedDate(
-    post.updatedDate ? post.updatedDate : post.createdDate,
-    "YYYY년 MM월 DD일"
-  );
+  const formattedCreatedDate = getFormattedDate(post.createdDate, "YYYY년 MM월 DD일");
+
+  const formattedUpdatedDate = post.updatedDate
+    ? getFormattedDate(post.updatedDate, "YYYY년 MM월 DD일")
+    : null;
 
   return (
     <div className="w-full mx-auto p-4">
@@ -30,11 +31,18 @@ function PostMeta({ tag, slug }: PostMetaProps) {
         </p>
       </div>
       <div className="flex max-w-[700px] mx-auto w-full justify-between items-center text-gray-600 text-sm">
-        <div className="flex items-center gap-2">
-          <Calendar className="size-4 dark:text-gray-400" />
-          <span className="dark:text-gray-400">
-            {post.updatedDate ? formattedDate + "에 수정됨" : formattedDate}
-          </span>
+        <div className="flex flex-col items-start gap-1">
+          <div className="flex items-center gap-2">
+            <Calendar className="size-4 dark:text-gray-400" />
+            <span className="dark:text-gray-400">{formattedCreatedDate}</span>
+          </div>
+
+          {post.updatedDate && (
+            <div className="flex items-center gap-2 text-chart-1">
+              <Calendar className="size-4" />
+              <span>{formattedUpdatedDate} 수정</span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Clock className="size-4 dark:text-gray-400" />
