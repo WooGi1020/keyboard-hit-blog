@@ -1,0 +1,346 @@
+---
+title: 리액트 라우터 v7로 알아보는 서버 컴포넌트
+description: 리액트 라우터는 어떤 방식으로 서버 컴포넌트를 다루고자 하는걸까?
+tag: React
+createdDate: 2025-12-31 16:48:01
+---
+
+<TOC />
+
+# ✨ 들어가며
+
+- 예전부터 구독하고 있는 [Korea FE Article](https://kofearticle.substack.com/)에서 리액트 라우터의 서버 컴포넌트 접근 방식을 다룬 글을 보내주셨다.
+- 기존에 리액트 라우터를 사용했던 방식은 `data mode`로, 클라이언트 컴포넌트(이하 CC)에서 데이터를 다루는 방식이었는데, 해당 글을 통해 리액트 라우터 v7에서 지향하는 서버 컴포넌트(이하 RSC) 생태계에 대해 알아보려고 한다.
+
+## 🔗 리액트 라우터란?
+
+- [리액트 라우터](https://reactrouter.com/)는 리액트 애플리케이션에서 라우팅을 관리하기 위한 라이브러리로서 사용되어 왔다. (보통 SPA를 자주 다루는 분들이라면 익숙할 것이라고 생각한다.)
+- 하지만 `Next.js`, `Remix`와 같은 풀스택 프레임워크의 등장과 더불어 리액트 라우터 v7 부터는 RSC를 지원하는 `framework mode`를 도입, 풀스택 프레임워크로서 변화하고 있다.
+- `framework mode`를 사용하면 라우팅뿐만 아니라 데이터 페칭, 폼 처리, 인증 등 다양한 기능을 제공하여 개발자가 보다 쉽게 풀스택 애플리케이션을 구축할 수 있는 환경을 세팅할 수 있다.
+
+```find
+기존에 사용하던 data mode가 아닌 framework mode를 통해 RSC 설계를 체험한 경험을 공유하고자 한다.
+```
+
+## 🔗 프로젝트 초기 세팅
+
+- 일단 나의 경우, RSC 환경 체험을 위해 `MSW`를 활용한 목업 서버와 `Vite`를 활용한 리액트 프로젝트를 모노 레포 환경으로 세팅했다.
+
+- `pnpm-workspace.yaml`을 작성하여 의존성 관리를 단일화하고 `npm` 배포 없이 패키지 간 로컬 참조가 가능하도록 설정했다.
+
+```bash
+echo "packages:
+  - 'apps/*'
+  - 'packages/*'" > pnpm-workspace.yaml
+```
+
+- 이후 `apps/web` 디렉토리에 `Vite` 기반의 리액트 라우터 프로젝트를 생성하고, `packages/api-mocks` 디렉토리에 `MSW` 목업 서버를 생성한다.
+
+```bash
+# apps/web/
+app
+├─ routes
+│  └─ home.tsx
+├─ app.css
+├─ entry.server.tsx
+├─ root.tsx
+└─ routes.ts
+public
+└─ mockServiceWorker.js
+
+# packages/api-mocks/
+src
+├─ handlers.ts
+└─ node.ts
+```
+
+- 추가적으로 `npm dlx msw init public/ --save` 명령어를 통해 `public/mockServiceWorker.js` 파일을 생성하여 개발 모드 진입 시 `MSW`가 동작할 수 있도록 하고, `entry.server.ts`를 작성하여 목업 서버가 SSR 환경에서도 동작할 수 있도록 설정했다.
+
+> 여기까지 진행하면 어느정도 준비 👌
+
+# ✨ 리액트 라우터의 RSC 접근 방식
+
+- 리액트 라우터 v7에서는 RSC를 지원하기 위해 몇 가지 주요 개념과 기능을 도입했다.
+
+## 🔗 라우트 단위의 데이터 페칭
+
+- 리액트 라우터 v7에서는 각 라우트 컴포넌트에서 데이터를 페칭할 수 있는 `loader` 함수를 제공한다.
+
+- `loader` 함수는 해당 라우트가 렌더링되기 전에 호출되어 필요한 데이터를 프론트 서버에서 미리 가져오고, 이를 컴포넌트에서 사용할 수 있도록 한다.
+
+```tsx
+export async function loader({ request }: Route.LoaderArgs) {
+  const res = await fetch("http://localhost:5173/api/v1/user");
+
+  if (!res.ok) throw new Response("Failed to fetch user data", { status: 500 });
+
+  return res.json();
+}
+```
+
+- 이를 통해 컴포넌트는 데이터를 직접 페칭하는 대신, `useLoaderData` 훅을 사용하여 미리 로드된 데이터를 쉽게 접근할 수 있다.
+
+```tsx
+const { name, role, id } = loaderData;
+
+return (
+  <div>
+    <h1>Welcome, {name}!</h1>
+    <p>Your role is: {role}</p>
+    <p>Your ID is: {id}</p>
+  </div>
+);
+```
+
+- `Next.js`와 다르게 리액트 라우터가 왜 RSC 접근 방식을 렌더링 단위가 아닌 라우트 단위로 가져가는지 생각해보았다.
+  - 라우트 단위로 데이터를 관리함으로써 각 페이지가 독립적으로 동작할 수 있도록 하기 위해
+  - 서버 컴포넌트의 장점을 살려 초기 렌더링 시점에 필요한 데이터를 미리 가져와 성능을 최적화하기 위해
+
+- 직접 사용해보니, 라우트 단위로 데이터를 관리하는 것은 UX측면에서 페이지 간 전환 시 데이터 페칭을 효율적으로 처리하고, DX측면에서 라우트별로 데이터를 관리하여 유지보수성을 높이는데 좋은 방식이라는 생각이 들었다.
+
+## 🔗 폼 처리와 액션
+
+- 리액트 라우터 v7에서는 폼 제출을 처리하기 위한 `action` 함수를 제공한다.
+
+- `action` 함수는 폼이 제출될 때 호출되어 서버 측에서 폼 데이터를 처리하고, 필요한 경우 리다이렉션이나 상태 업데이트를 수행할 수 있다.
+
+```tsx
+export async function action({ request }: Route.ActionArgs) {
+  try {
+    const formData = await request.formData();
+    const res = await fetch("http://localhost:5173/api/v1/login", {
+      method: "POST",
+      body: JSON.stringify(Object.fromEntries(formData)),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!res.ok) {
+      // 에러 처리
+    }
+
+    const data = await res.json();
+    return await createSession(request, data.accessToken);
+  } catch (e) {
+    return { error: "서버 연결에 실패했습니다." };
+  }
+}
+```
+
+- 폼 컴포넌트에서는 `useActionData` 훅을 사용하여 액션 함수에서 반환된 데이터에 접근할 수 있다.
+
+```tsx
+const actionData = useActionData<typeof action>();
+
+return (
+  <form method="post">
+    {actionData?.error && <p className="error">{actionData.error}</p>}
+    {/* 폼 필드들 */}
+  </form>
+);
+```
+
+- 이를 통해 폼 제출과 관련된 로직을 컴포넌트에서 분리하여 서버 측에서 처리할 수 있어 코드의 명확성과 유지보수성이 향상된다.
+
+> 특히 기존의 폼 처리 방식과 비교하여 제출 로직 자체를 서버 측으로 이관했다는 점에서 신선했고 무엇보다 RSC의 지향점을 잘 살린 접근 방식이라고 생각한다.
+
+## 🔗 loader와 action 활용하기
+
+- 앞서 설명한 `loader`와 `action` 함수를 활용하면 프론트 서버에서 쿠키 관리 로직을 작성하여 인증 흐름을 처리하고, 부가적으로 메세지 피드백 등의 로직도 구현이 가능해진다.
+
+```tsx
+export const authSessionStorage = createCookieSessionStorage({
+  cookie: {
+    name: "__session",
+    httpOnly: true,
+    path: "/",
+    sameSite: "lax",
+    secrets: ["s3cr3t"],
+    secure: process.env.NODE_ENV === "production",
+  },
+});
+```
+
+- 리액트 라우터는 세션을 활용하여 인증 상태를 관리할 수 있는 `createCookieSessionStorage` 유틸리티를 제공한다.
+
+- 이를 통해 `loader`와 `action` 함수 내에서 세션을 읽고 쓰는 작업을 수행할 수 있다.
+
+```tsx
+// loader에서 활용하는 예제
+export async function loader({ request }: Route.LoaderArgs) {
+  // createCookieSessionStorage의 메서드를 활용하여 세션에서 액세스 토큰을 가져올 수 있도록 처리
+  const { accessToken } = await getSessionData(request);
+  if (!accessToken) throw redirect("/login");
+
+  const res = await fetch("http://localhost:5173/api/v1/user", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!res.ok) throw redirect("/login");
+
+  return await res.json();
+}
+```
+
+```tsx
+// action에서 사용하는 로그아웃 예제
+export async function logout(request: Request) {
+  // 세션에서 액세스 토큰 제거 후 로그인 페이지 리다이렉트
+  const session = await authSessionStorage.getSession(request.headers.get("Cookie"));
+  session.unset("accessToken");
+  throw redirect("/login", {
+    headers: {
+      "Set-Cookie": await authSessionStorage.commitSession(session),
+    },
+  });
+}
+```
+
+- 정말 신선하다고 느낀 부분은 단순히 쿠키 저장 용도로 세션을 활용하는 것이 아닌 `flash`와 같은 함수를 사용하여 처리 결과를 세션에 저장, 이를 `loader` 함수에서 읽어와 사용할 수 있다는 점이었다.
+
+```tsx
+export async function redirectWithFlash(request: Request, url: string, message: string) {
+  const session = await authSessionStorage.getSession(request.headers.get("Cookie"));
+  // 동적으로 string 메세지를 받아와 세션에 flash 메시지로 저장하는 로직
+  session.flash("toast", message);
+  return redirect(url, {
+    headers: {
+      "Set-Cookie": await authSessionStorage.commitSession(session),
+    },
+  });
+}
+```
+
+- 예를 들면 `flash` 함수에 메세지를 저장하여 이를 유저 피드백으로 제공할 수 있다.
+
+```tsx
+// loader에서 flash 메시지를 읽어오는 예제
+const { toast } = useLoaderData<typeof loader>();
+
+useEffect(() => {
+  if (toast) {
+    alert(toast);
+  }
+}, [toast]);
+```
+
+## 🔗 useFetcher를 사용한 부분 데이터 페칭
+
+- 리액트 라우터 v7은 `useFetcher` 훅을 제공하여 컴포넌트 내에서 부분적으로 데이터 페칭과 폼 제출을 처리할 수 있다.
+
+- 이는 데이터 페칭을 컴포넌트 단위로 세분화하기 위한 기존 리액트의 수많은 `useState` 와 `useEffect` 훅 사용 방식을 대체한다.
+
+- `useFetcher`를 활용하여 다양한 유저 인터렉션과 실시간 처리가 필요한 이커머스 페이지를 구현해보았다.
+
+```tsx
+import { useLoaderData, useFetcher } from "react-router";
+import type { Route } from "./+types/product.$id";
+import { useEffect } from "react";
+
+export async function loader({ params }: Route.LoaderArgs) {
+  const res = await fetch(`http://localhost:5173/api/v1/products/${params.id}`);
+  if (!res.ok) throw new Response("Not Found", { status: 404 });
+  return await res.json();
+}
+
+export default function ProductDetail() {
+  const product = useLoaderData<typeof loader>();
+  const wishFetcher = useFetcher();
+  const cartFetcher = useFetcher();
+  const stockFetcher = useFetcher();
+
+  useEffect(() => {
+    if (product.stock === 0) return;
+    const interval = setInterval(() => {
+      stockFetcher.load(`/api/stock/${product.id}`);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [product.id, product.stock]);
+
+  const isWished = wishFetcher.formData
+    ? wishFetcher.formData.get("intent") === "wish"
+    : product.isWished;
+
+  return (
+    <div className="max-w-4xl m-auto p-8 grid grid-cols-2 gap-12">
+      <div>
+        <img
+          src="https://www.logoyogo.com/web/wp-content/uploads/edd/2021/02/logoyogo-1-310.jpg"
+          alt="키보드"
+          className="aspect-square border-gray-200 border bg-gray-200 rounded-2xl mb-4 object-cover"
+        />
+        <h1 className="text-3xl font-bold">{product.name}</h1>
+        <p className="text-2xl mt-2">{product.price.toLocaleString()}원</p>
+
+        <div className="mt-8">
+          <h3 className="font-bold border-b pb-2">리뷰 ({product.reviews.length})</h3>
+          {product.reviews.map((r: any) => (
+            <p key={r.id} className="py-2 text-gray-600 border-b text-sm">
+              {r.content}
+            </p>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        <div className="p-4 bg-orange-50 text-orange-700 rounded-xl font-medium">
+          {product.stock === 0
+            ? "재고가 없습니다."
+            : stockFetcher.data
+              ? `재고 ${stockFetcher.data.stock}개 남음 (실시간 업데이트)`
+              : `재고 ${product.stock}개 남음`}
+        </div>
+
+        <div className="flex gap-4">
+          <button
+            onClick={() =>
+              cartFetcher.submit({ productId: product.id }, { method: "post", action: "/api/cart" })
+            }
+            className="flex-1 bg-black text-white py-4 rounded-xl font-bold"
+          >
+            {cartFetcher.state !== "idle" ? "담는 중..." : "장바구니 담기"}
+          </button>
+
+          <wishFetcher.Form method="patch" action="/api/wishlist">
+            <input type="hidden" name="productId" value={product.id} />
+            <button
+              name="intent"
+              value="wish"
+              className={`p-4 rounded-xl border ${
+                isWished ? "bg-red-50 border-red-200" : "bg-white"
+              }`}
+            >
+              {isWished ? "❤️" : "🤍"}
+            </button>
+          </wishFetcher.Form>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+- 해당 페이지에는 상품 정보, 리뷰, 재고 상태, 장바구니 담기, 찜하기 기능이 포함되어 있다.
+
+- `useFetcher` 훅을 사용하여 찜하기, 장바구니 담기, 재고 상태 업데이트와 같은 부분적인 데이터 페칭과 폼 제출을 처리한다.
+
+- `useFetcher`의 폼 데이터와 실제 페칭된 데이터를 활용하여 낙관적 업데이트를 구현했다.
+
+- 이를 통해 사용자는 페이지 전체를 리로드하지 않고도 다양한 상호작용을 할 수 있어 UX가 크게 향상된다.
+
+![이커머스 서비스 예제](/images/post/example.webp)
+
+```find
+사실 Next.js를 주로 사용해왔기에 리액트 라우터의 RSC 접근 방식이 다소 생소하게 느껴졌지만, 직접 사용해보니 충분히 매력적인 생태계라는 생각이 들었고, 오히려 라우트 단위의 환경 분리를 통해 하이브리드틱한 RSC 설계가 가능하다는 점이 인상적이었다.
+```
+
+# ✨ 마치며
+
+- 리액트 라우터 v7의 RSC 접근 방식은 라우트 단위의 데이터 페칭, 폼 처리와 액션, `useFetcher`를 통한 부분 데이터 페칭 등 다양한 기능을 제공하여 풀스택 애플리케이션 개발을 보다 효율적으로 만들어준다.
+
+- 이러한 기능들을 활용하면 개발자는 서버와 클라이언트 간의 경계를 효과적으로 관리하면서도 뛰어난 사용자 경험을 제공할 수 있다.
+
+- 사실 `FE article`에서 다룬 글은 앞으로 나올 리액트 라우터의 방향성 (컴포넌트 자체를 RSC로 작성하는 등)을 제시하는 글이었지만, 해당 포스트는 조금 더 기본적인 RSC 접근 방식을 다루고자 했다.
+
+- 다양한 기능을 경험해보고 체화하여 앞으로 리액트 생태계에서 RSC를 활용한 개발을 할 때 도움이 되었으면 한다.
+
+> - 참고자료 <br /> [React Router v7 Documentation](https://reactrouter.com/en/main) <br /> [Korea FE Article - React Router의 서버 컴포넌트 접근 방식](https://ykss.netlify.app/translation/react_router_take_on_rsc/?utm_source=substack&utm_medium=email)
