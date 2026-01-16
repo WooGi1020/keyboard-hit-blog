@@ -15,8 +15,13 @@ function AboutProject() {
   };
 
   return (
-    <>
-      <span className="text-chart-1 mb-[-30px]">My Project</span>
+    <div className="flex flex-col gap-8">
+      <div className="flex items-center gap-3">
+        <span className="text-xs font-bold uppercase tracking-widest text-chart-1 opacity-80">
+          Projects
+        </span>
+        <div className="h-px flex-1 bg-chart-1/10" />
+      </div>
       <div className="flex flex-col gap-4">
         {projectArr.map((project) => (
           <ProjectCard key={project.name} project={project} />
@@ -25,7 +30,7 @@ function AboutProject() {
           {sliceNum === 3 ? "더보기" : "접기"}
         </Button>
       </div>
-    </>
+    </div>
   );
 }
 
