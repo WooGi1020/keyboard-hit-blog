@@ -3,9 +3,24 @@ const ABOUT_ME = {
   avatar: "https://avatars.githubusercontent.com/u/113000290?v=4",
   role: "서비스 철학을 기술 로직으로 실현하는 프론트엔드 엔지니어",
   address: "대한민국 경기도",
+  email: "jungwk1020@gmail.com",
+  github: "https://github.com/WooGi1020",
 
   description:
-    "단순 기능 구현을 넘어 서비스의 핵심 컨셉을 기술적 로직으로 구체화하는 데 집중합니다.\n프로젝트의 본질을 엔지니어링에 반영하여 제품의 완성도를 높이는 것을 최우선 가치로 삼습니다.\n자기 객관화와 기술 습득을 통해 서비스 성능 최적화 및 안정적 운영 역량을 지속적으로 고도화합니다.",
+    "기술의 원리를 깊이 파고들어 탐구하는 과정과 이를 함께 나누며 최적의 결과를 위한 답을 찾아가는 여정이 정말 흥미롭고 즐겁습니다.\n제가 얻은 인사이트를 투명하게 공유하고, 피드백을 주고받으며 동료와 함께 성장하는 커뮤니케이션을 지향합니다.\n이러한 과정들이 엔지니어로서 느끼는 가장 큰 보람이며, 몰입과 공유의 가치를 바탕으로 어제보다 더 나은 스스로가 되고자 합니다.",
+
+  skills: {
+    "Core Engineering": [
+      "TypeScript",
+      "JavaScript(ES6+)",
+      "React",
+      "Next.js(App Router",
+      "Flutter",
+    ],
+    "Data & State Management": ["Zustand", "Tanstack Query", "SSE(Server-Sent Events)"],
+    "Styling & Interaction": ["Tailwind CSS", "Framer Motion", "Shadcn UI", "Kakao Map API"],
+    "DevOps & Collaboration": ["Git & GitHub", "Vercel", "CI/CD(GitHub Actions)", "Edge Runtime"],
+  },
 
   project: [
     {
@@ -42,7 +57,7 @@ const ABOUT_ME = {
     },
     {
       name: "Fresh Plate",
-      description: "비건 & 알러지인들을 위한 외식 정보 제공 플랫폼 - 졸업 프로젝트",
+      description: "비건 & 알러지인들을 위한 외식 정보 제공 플랫폼 (졸업 프로젝트)",
       link: "https://github.com/WooGi1020/fresh_plate",
       period: "2024-05-24 ~ 2025-11-11",
       tag: ["Next.js", "Tailwind", "Typescript", "Kakao-Map-API"],
