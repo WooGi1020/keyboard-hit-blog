@@ -43,7 +43,7 @@ function AboutMeta() {
           </div>
         </div>
         <Avatar className="size-32 max-sm:hidden border-2 border-chart-1 rounded-full p-1">
-          <AvatarImage src={ABOUT_ME.avatar} />
+          <AvatarImage src={ABOUT_ME.avatar} alt="아바타 이미지" />
           <AvatarFallback>{ABOUT_ME.name}</AvatarFallback>
         </Avatar>
       </div>
