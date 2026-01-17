@@ -1,0 +1,131 @@
+---
+title: Zustand 조금 뜯어보기
+description: Vanilla JS 기반인 Zustand가 React와 결합할 수 있는 이유
+tag: Javascript
+createdDate: 2026-01-17 16:49:48
+---
+
+<TOC />
+
+# ✨ 들어가며
+
+- 최근 들어 취업을 준비하면서 남는 시간을 활용해 내가 사용해왔던 라이브러리나 프레임워크가 어떻게 동작하는지 알아보는 시간을 갖고 있다.
+- 이번 포스트에서는 내가 자주 사용해왔던 상태 관리 라이브러리인 [Zustand](https://zustand-demo.pmnd.rs/)가 어떻게 동작하는지 알아보려고 한다.
+
+## 🔗 Zustand의 아키텍처 : 왜 Vanilla 인가?
+
+- **Zustand**는 기본적으로 리액트 없이도 동작하는 **바닐라 자바스크립트 스토어**를 기반으로 한다.
+- 이는 전역 상태가 리액트의 생명주기에 구애받지 않고 독립적으로 존재할 수 있도록 한다.
+- 핵심 메커니즘은 세가지 정도이다.
+  - **state**: 애플리케이션의 상태를 저장하는 객체
+  - **Listeners**: 상태 변경을 감지하고 반응하는 함수들의 집합
+  - **subscribe**: 상태 변경 시 리스너들을 호출하는 메커니즘
+
+## 🔗 바닐라 버전 Store 구현해보기
+
+- **Zustand** 공식 문서를 참고하여 바닐라 JS 버전의 간단한 스토어를 구현했다.
+
+```js
+// vanilla.js
+export const createStore = (createState) => {
+  let state;
+  const listeners = new Set(); // 리스너 중복 방지를 위한 Set
+
+  // 상태 업데이트 함수
+  const setState = (partial, replace) => {
+    // 얕은 비교를 통해 변경 사항이 있을 때만 업데이트 (Zustand의 특징)
+    const nextState = typeof partial === 'function' ? partial(state) : partial;
+
+    if (!Object.is(nextState, state)) {
+      const previousState = state;
+      state = (replace ?? typeof nextState !== 'object' || nextState === null)
+        ? nextState
+        : Object.assign({}, state, nextState);
+
+      // 상태 변경 후 등록된 모든 리스너에게 알림 발송
+      listeners.forEach((listener) => listener(state, previousState));
+    }
+  };
+
+  const getState = () => state;
+
+  // 구독 시스템: 리스너 등록 및 해제 함수 반환
+  const subscribe = (listener) => {
+    listeners.add(listener);
+    return () => listeners.delete(listener); // Unsubscribe
+  };
+
+  const api = { setState, getState, subscribe };
+  state = createState(setState, getState, api); // 초기 상태 설정
+
+  return api;
+};
+```
+
+- **바닐라 Zustand**의 핵심은 발행-구독 모델을 통한 단순성에 있다.
+
+- 현재 상태의 **스냅샷** 가져오는 `getState`, 상태를 변경하는 `setState`, 상태 변경을 구독하는 `subscribe` 메서드로 구성되어 있다.
+- 추가적으로 `getInitialState` 메서드를 통해 초기 상태를 가져올 수도 있다.
+
+## 🔗 Zustand의 강력함
+
+- 무엇보다 **Zustand**가 강력한 이유는 **클로저**, **불변성 관리** 등 자바스크립트의 **핵심적인 개념**들이 잘 녹아들어 있다는 점이다.
+
+- ### 클로저
+  - `createStore` 함수 내부에서 정의된 `state`와 `listeners` 변수는 외부에서 직접 접근할 수 없지만, `setState`, `getState`, `subscribe` 메서드를 통해 간접적으로 접근할 수 있다.
+  - 이를 통해 상태와 리스너들이 외부로부터 보호되며, 오직 제공된 메서드들만이 상태를 변경하거나 조회할 수 있다.
+
+- ### 불변성 관리
+  - `setState` 메서드는 상태를 변경할 때 기존 상태 객체를 직접 수정하지 않고, 새로운 상태 객체를 생성하여 반환 후 얕은 비교를 통해 변경 여부를 판단한다.
+  - 이는 불변성 원칙을 준수하며, 상태 변경이 발생할 때마다 새로운 객체가 생성되므로 변경 감지가 용이하다.
+
+- ### Listeners 관리
+  - `listeners`는 `Set` 자료구조를 사용하여 중복된 리스너 등록을 방지하고, 상태 변경 시 모든 리스너에게 알림을 보낸다.
+  - 이를 통해 상태 변경에 따른 반응형 업데이트가 가능하다.
+
+# ✨ 리액트와 연결하기
+
+- 이제 이 바닐라 스토어를 **리액트**에 연결해야 한다.
+
+- 기존에 사용하던 방식은 리액트와의 연결을 위해 `useState`, `useEffect` 훅을 사용하여 상태 변경을 **감지**하고 컴포넌트를 **리렌더링**하는 방식이었다.
+
+- 리액트가 18버전으로 진입하며, **동시성 모드**의 등장과 함께 해당 방식은 **테어링** 현상을 유발했다.
+
+## 🔗 리액트의 useSyncExternalStore
+
+- 이를 해결하기 위해 **Zustand**는 리액트가 제공하는 `useSyncExternalStore` 훅을 사용하여 외부 스토어와의 동기화를 처리한다.
+
+```js
+// Counter.jsx
+import { useSyncExternalStore } from "react";
+import { store } from "./store.js";
+
+function Counter() {
+  // useSyncExternalStore
+  const count = useSyncExternalStore(store.subscribe, () => store.getState().count);
+
+  const { increase, decrease } = store.getState();
+
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button onClick={increase}>+</button>
+      <button onClick={decrease}>-</button>
+    </div>
+  );
+}
+```
+
+- `useSyncExternalStore` 훅은 외부 스토어의 구독 메서드와 상태 조회 메서드를 인자로 받아, 스토어의 상태가 변경될 때마다 컴포넌트를 안전하게 리렌더링한다.
+
+- 이를 통해 리액트의 동시성 모드에서도 안정적으로 상태 관리를 할 수 있게 된다.
+
+# 📝 결론
+
+```find
+라이브러리의 API 사용법은 시간이 지나면 변하거나 대체될 수 있다.
+하지만 그 속에 담긴 기술적 원리는 변하지 않는다.
+단순히 사용만 하지 않고 알맹이를 이해하기 위해 노력하면 얻을 수 있는 시야가 있다고 생각한다.
+```
+
+> [Zustand Store 바닐라 코드](https://github.com/pmndrs/zustand/blob/main/src/vanilla.ts)
