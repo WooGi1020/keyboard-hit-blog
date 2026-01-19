@@ -1,6 +1,7 @@
 const ABOUT_ME = {
   name: "정우기",
   avatar: "https://avatars.githubusercontent.com/u/113000290?v=4",
+  avatarBack: "/images/avatar-back.jpg",
   role: "서비스 철학을 기술 로직으로 실현하는 프론트엔드 엔지니어",
   address: "대한민국 경기도",
   email: "jungwk1020@gmail.com",

@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ABOUT_ME from "@/constant/ABOUT_ME";
 import { MapIcon, Mail, Github, Globe } from "lucide-react";
 import Link from "next/link";
+import FlippableAvatar from "./FlippableAvatar";
 
 function AboutMeta() {
   return (
@@ -42,10 +43,15 @@ function AboutMeta() {
             </div>
           </div>
         </div>
-        <Avatar className="size-32 max-sm:hidden border-2 border-chart-1 rounded-full p-1">
+        <FlippableAvatar
+          frontSrc={ABOUT_ME.avatar}
+          backSrc={ABOUT_ME.avatarBack}
+          fallback={ABOUT_ME.name}
+        />
+        {/* <Avatar className="size-32 max-sm:hidden border-2 border-chart-1 rounded-full p-1">
           <AvatarImage src={ABOUT_ME.avatar} alt="아바타 이미지" />
           <AvatarFallback>{ABOUT_ME.name}</AvatarFallback>
-        </Avatar>
+        </Avatar> */}
       </div>
     </>
   );
