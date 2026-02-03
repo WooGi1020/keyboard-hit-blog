@@ -35,7 +35,7 @@ function PostCard({ post, size = "small" }: PostCardProps) {
     <Link
       href={postUrl}
       className={cn(
-        "group flex p-4 sm:p-6 hover:rounded-2xl hover:shadow-md hover:bg-accent/30 dark:hover:bg-accent-dark/90 dark:shadow-accent-dark/20 transition-all duration-300",
+        "group flex p-4 sm:p-6 hover:rounded-2xl hover:shadow-md hover:bg-accent/30 dark:hover:bg-accent-dark/90 dark:shadow-accent-dark/20 transition-all duration-100",
         isLarge
           ? "flex-col lg:flex-row gap-6 lg:gap-8 lg:items-stretch sm:mb-12 lg:mb-16 mb-0"
           : "flex-col h-full",
@@ -44,7 +44,7 @@ function PostCard({ post, size = "small" }: PostCardProps) {
     >
       <div
         className={cn(
-          "relative overflow-hidden rounded-xl lg:rounded-2xl border border-border/40 bg-muted shrink-0",
+          "relative overflow-hidden rounded-r-xl lg:rounded-r-2xl border border-border/40 dark:border-[#0f172a] shrink-0",
           isLarge
             ? "w-full lg:w-[55%] aspect-video sm:aspect-[1.91/1]"
             : "w-full aspect-[1.91/1] mb-4 lg:mb-5",
