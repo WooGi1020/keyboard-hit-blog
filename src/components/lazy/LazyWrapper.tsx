@@ -24,5 +24,7 @@ export function LazyLoadLottieMonitor() {
 }
 
 export function LazyLoadLottieKeyboard() {
-  return <LazyLottieKeyboard className="-translate-y-5" />;
+  return (
+    <LazyLottieKeyboard className="lottie-animation w-14 h-14 transition-transform duration-300 -translate-y-3.5 -translate-x-2" />
+  );
 }
