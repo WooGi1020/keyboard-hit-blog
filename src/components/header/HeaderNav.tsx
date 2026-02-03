@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
+import LottieKeyboard from "../animation/lottieKeyboard";
 
 const ThemeChangeButton = dynamic(() => import("../themes/ThemeChangeButton"), {
   ssr: false,
@@ -14,9 +15,9 @@ function HeaderNav() {
 
   return (
     <nav className="flex justify-between items-center h-full w-full max-w-[1232px] px-4 mx-auto">
-      <div className="flex gap-3 items-center">
-        <Link href="/">
-          <h1 className="text-[18px] font-semibold outline-none">키보드 두들기며 먹고살기</h1>
+      <div className="flex gap-0 items-center">
+        <Link href="/" className="flex items-center w-18">
+          <LottieKeyboard className="-translate-y-3.5 w-15 h-15 hover:w-16 hover:h-16 transition-all duration-200" />
         </Link>
         <Link
           href="/about"

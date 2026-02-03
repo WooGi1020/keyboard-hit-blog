@@ -11,7 +11,7 @@ function Footer() {
             </h2>
             <p className="text-sm text-muted-foreground">
               키보드 두들기며 먹고살기{" "}
-              <span className="text-xs bg-muted px-1.5 py-0.5 rounded ml-1">v1.1.0</span>
+              <span className="text-xs bg-muted px-1.5 py-0.5 rounded ml-1">v1.2.0</span>
             </p>
           </div>
 

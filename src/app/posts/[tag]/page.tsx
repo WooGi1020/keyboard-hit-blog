@@ -3,8 +3,7 @@ import Posts from "@/app/posts/_components/Posts";
 import { getMetaData } from "@/utils/getMetaData";
 import { getTagData } from "@/utils/tagUtil";
 import { getPostMetaData } from "@/utils/tagUtil";
-
-import { LazyLoadLottieKeyboard } from "@/components/lazy/LazyWrapper";
+import MainHeader from "../_components/MainHeader";
 
 type Props = {
   params: { tag: string };
@@ -40,14 +39,14 @@ async function PostsPage({ params }: Props) {
   const decodedTag = decodeURIComponent(tag);
 
   const { tagInfos, allTagCount } = getTagData();
-  const postMetaData: ReturnType<typeof getPostMetaData> = getPostMetaData(); // 가벼운 데이터 로드
+  const postMetaData: ReturnType<typeof getPostMetaData> = getPostMetaData();
 
   return (
-    <>
-      <LazyLoadLottieKeyboard />
+    <section className="flex flex-col w-full pb-20 pt-16 sm:pt-24">
+      <MainHeader />
       <TagNav tagInfos={tagInfos} allTagCount={allTagCount} />
-      <Posts tag={decodedTag} posts={postMetaData} /> {/* 데이터를 prop으로 주입 */}
-    </>
+      <Posts tag={decodedTag} posts={postMetaData} />
+    </section>
   );
 }
 

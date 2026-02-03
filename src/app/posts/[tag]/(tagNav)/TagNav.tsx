@@ -1,33 +1,50 @@
 "use client";
 
-import type { TagInfos } from "@blogType";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useEffect } from "react";
+import { cn } from "@/lib/utils";
 
-export function TagNav({ tagInfos, allTagCount }: { tagInfos: TagInfos; allTagCount: number }) {
+interface TagInfo {
+  tag: string;
+  count: number;
+}
+
+export function TagNav({ tagInfos, allTagCount }: { tagInfos: TagInfo[]; allTagCount: number }) {
   const pathname = usePathname();
 
   useEffect(() => {
     const selectedLink = document.querySelector(`a[href='${pathname}']`);
-    selectedLink?.scrollIntoView({ block: "nearest" });
+    selectedLink?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
   }, [pathname]);
 
+  const isActive = (path: string) => pathname === path || (path === "/" && pathname === "/");
+
   return (
-    <nav className="flex mt-20 items-center mx-auto max-w-[350px] sm:max-w-[700px] overflow-x-auto px-2 whitespace-nowrap gap-1 text-lg border-b-2 border-input pb-3 custom-scrollbar">
+    <nav className="flex items-center w-full max-w-[1240px] mx-auto overflow-x-auto px-4 sm:px-6 py-3 mb-6 sm:py-6 no-scrollbar gap-2 sm:gap-3">
       <Link
-        className={`text-chart-1 font-semibold px-2 py-1 rounded-md hover:bg-input ${pathname === "/" && "bg-input"}`}
+        className={cn(
+          "px-5 py-2 text-sm sm:text-base font-bold whitespace-nowrap rounded-full border",
+          isActive("/")
+            ? "bg-foreground text-background border-foreground shadow-sm"
+            : "bg-background text-muted-foreground border-border hover:border-foreground hover:text-foreground"
+        )}
         href="/"
       >
-        전체 <span>({allTagCount})</span>
+        전체 <span className="ml-1 opacity-50 font-medium">{allTagCount}</span>
       </Link>
       {tagInfos.map((tagInfo) => (
         <Link
-          className={`text-chart-1 font-semibold px-2 py-1 rounded-md hover:bg-input ${pathname === `/posts/${tagInfo.tag}` && "bg-input"}`}
+          className={cn(
+            "px-5 py-2 text-sm sm:text-base font-bold whitespace-nowrap rounded-full border",
+            isActive(`/posts/${tagInfo.tag}`)
+              ? "bg-foreground text-background border-foreground shadow-sm"
+              : "bg-background text-muted-foreground border-border hover:border-foreground hover:text-foreground"
+          )}
           href={`/posts/${tagInfo.tag}`}
           key={tagInfo.tag}
         >
-          {tagInfo.tag} <span>({tagInfo.count})</span>
+          {tagInfo.tag} <span className="ml-1 opacity-50 font-medium">{tagInfo.count}</span>
         </Link>
       ))}
     </nav>

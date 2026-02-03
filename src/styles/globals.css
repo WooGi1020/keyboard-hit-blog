@@ -126,20 +126,12 @@
 /* 4. 유틸리티 레이어 */
 
 @layer utilities {
-  .custom-scrollbar::-webkit-scrollbar {
-    @apply w-1.5 h-1.5 bg-transparent;
+  .no-scrollbar {
+    scrollbar-width: none;
   }
 
-  .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-gray-600 transition-colors hover:bg-gray-600 dark:bg-gray-400 dark:hover:bg-gray-500;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-corner {
-    @apply bg-transparent;
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 
   .lottie-animation {

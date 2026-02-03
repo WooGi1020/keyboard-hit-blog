@@ -33,9 +33,7 @@ export default function RootLayout({
       <body className={`${pretendardFont.className}`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Header />
-          <main className="my-20 w-full px-4">
-            <section className="flex flex-col gap-6">{children}</section>
-          </main>
+          <main className="my-15 w-full px-4">{children}</main>
           <Footer />
           <Toaster />
         </ThemeProvider>

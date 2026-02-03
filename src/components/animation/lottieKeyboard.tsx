@@ -10,12 +10,12 @@ function LottieKeyboard({ className }: { className?: string }) {
   const { theme } = useTheme();
 
   return (
-    <div className={cn(className)}>
+    <div className={cn("flex items-center justify-center", className)}>
       <Lottie
         autoplay
         loop
-        animationData={theme === "white" ? animationData : whiteAnimationData}
-        style={{ height: "80px", width: "80px" }}
+        animationData={theme === "dark" ? whiteAnimationData : animationData}
+        style={{ height: "100%", width: "100%" }}
       />
     </div>
   );

@@ -3,8 +3,7 @@ import Posts from "@/app/posts/_components/Posts";
 import { getMetaData } from "@/utils/getMetaData";
 import { getPostMetaData } from "@/utils/tagUtil";
 import { getTagData } from "@/utils/tagUtil";
-
-import { LazyLoadLottieKeyboard } from "@/components/lazy/LazyWrapper";
+import MainHeader from "./posts/_components/MainHeader";
 
 export async function generateMetadata() {
   return getMetaData({
@@ -19,10 +18,10 @@ export default function Home() {
   const postMetaData: ReturnType<typeof getPostMetaData> = getPostMetaData();
 
   return (
-    <>
-      <LazyLoadLottieKeyboard />
+    <section className="flex flex-col w-full pb-20 pt-16 sm:pt-24">
+      <MainHeader />
       <TagNav tagInfos={tagInfos} allTagCount={allTagCount} />
       <Posts tag="all" posts={postMetaData} />
-    </>
+    </section>
   );
 }

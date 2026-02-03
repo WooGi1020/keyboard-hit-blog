@@ -23,11 +23,28 @@ function Posts({ tag, posts }: PostsProps) {
   }
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto px-4 pb-20">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10 lg:gap-x-8 lg:gap-y-12">
-        {filteredPosts.map((post) => (
-          <PostCard key={post.slug} post={post} />
-        ))}
+    <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
+      <div className="flex flex-col gap-2">
+        {/* Most Recent Post - Large Layout */}
+        <PostCard post={filteredPosts[0]} size="large" />
+
+        {/* Following 2 Posts - Medium/Grid Layout */}
+        {filteredPosts.length > 1 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
+            {filteredPosts.slice(1, 3).map((post) => (
+              <PostCard key={post.slug} post={post} size="medium" />
+            ))}
+          </div>
+        )}
+
+        {/* Rest of the Posts - Standard Grid Layout */}
+        {filteredPosts.length > 3 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-2">
+            {filteredPosts.slice(3).map((post) => (
+              <PostCard key={post.slug} post={post} size="small" />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

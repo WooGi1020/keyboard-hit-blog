@@ -24,11 +24,5 @@ export function LazyLoadLottieMonitor() {
 }
 
 export function LazyLoadLottieKeyboard() {
-  const pathname = usePathname();
-
-  return (
-    <LazyLottieKeyboard
-      className={`${pathname === "/" ? "lottie-animation" : ""} absolute top-12 left-1/2 -translate-x-1/2`}
-    />
-  );
+  return <LazyLottieKeyboard className="-translate-y-5" />;
 }

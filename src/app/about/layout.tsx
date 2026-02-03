@@ -8,5 +8,5 @@ export const metadata: Metadata = getMetaData({
 });
 
 export default function AboutLayout({ children }: { children: React.ReactNode }) {
-  return <section className="max-w-[700px] mx-auto w-full">{children}</section>;
+  return <section className="max-w-[700px] mx-auto mt-30 w-full">{children}</section>;
 }
