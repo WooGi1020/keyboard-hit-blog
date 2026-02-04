@@ -8,7 +8,7 @@ export default function HomeLink({ pathname }: { pathname: string }) {
     <Link
       href="/"
       title="메인 페이지 링크"
-      className="group relative flex items-center justify-center w-28 h-10 hover:scale-103 transition-transform duration-300"
+      className="group relative flex items-center justify-center w-28 h-10 transition-transform duration-300"
     >
       <div
         className={cn(
