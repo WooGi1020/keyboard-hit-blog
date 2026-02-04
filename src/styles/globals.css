@@ -34,6 +34,16 @@
 
   --animate-fall: fall 0.7s ease-in-out;
   --animate-mouse-move: mouse-move 2s ease-in-out infinite;
+  --animate-fade-in: fadeIn 0.3s ease-in-out;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0.5;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 
   @keyframes fall {
     0% {

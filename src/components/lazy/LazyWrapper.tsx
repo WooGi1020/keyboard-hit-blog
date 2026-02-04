@@ -19,6 +19,9 @@ const ThemeChangeButton = dynamic(() => import("../themes/ThemeChangeButton"), {
   ssr: false,
 });
 
+const LazyVisitStats = dynamic(() => import("../stat/VisitStats"), {
+  ssr: false,
+});
 export function LazyThemeChangeButton() {
   return <ThemeChangeButton />;
 }
@@ -35,4 +38,8 @@ export function LazyLoadLottieKeyboard() {
   return (
     <LazyLottieKeyboard className="animate-fall w-14 h-14 transition-transform duration-300 -translate-y-3.5 -translate-x-2" />
   );
+}
+
+export function LazyVisitStatistics() {
+  return <LazyVisitStats />;
 }
