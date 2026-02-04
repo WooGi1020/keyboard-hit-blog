@@ -15,16 +15,24 @@ const LazyLottieKeyboard = dynamic(() => import("@/components/animation/lottieKe
   ssr: false,
 });
 
+const ThemeChangeButton = dynamic(() => import("../themes/ThemeChangeButton"), {
+  ssr: false,
+});
+
+export function LazyThemeChangeButton() {
+  return <ThemeChangeButton />;
+}
+
 export function LazyLoadGiscus() {
   return <LazyGiscus />;
 }
 
 export function LazyLoadLottieMonitor() {
-  return <LazyLottieMonitor className="lottie-animation mx-auto relative bottom-5" />;
+  return <LazyLottieMonitor className="animate-fall mx-auto" />;
 }
 
 export function LazyLoadLottieKeyboard() {
   return (
-    <LazyLottieKeyboard className="lottie-animation w-14 h-14 transition-transform duration-300 -translate-y-3.5 -translate-x-2" />
+    <LazyLottieKeyboard className="animate-fall w-14 h-14 transition-transform duration-300 -translate-y-3.5 -translate-x-2" />
   );
 }
