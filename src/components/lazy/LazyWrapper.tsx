@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { usePathname } from "next/navigation";
 
 const LazyGiscus = dynamic(() => import("@/components/giscus/Giscus"), {
   ssr: false,
@@ -19,9 +18,6 @@ const ThemeChangeButton = dynamic(() => import("../themes/ThemeChangeButton"), {
   ssr: false,
 });
 
-const LazyVisitStats = dynamic(() => import("../stat/VisitStats"), {
-  ssr: false,
-});
 export function LazyThemeChangeButton() {
   return <ThemeChangeButton />;
 }
@@ -38,8 +34,4 @@ export function LazyLoadLottieKeyboard() {
   return (
     <LazyLottieKeyboard className="animate-fall w-14 h-14 transition-transform duration-300 -translate-y-3.5 -translate-x-2" />
   );
-}
-
-export function LazyVisitStatistics() {
-  return <LazyVisitStats />;
 }

@@ -1,12 +1,29 @@
-import { LazyVisitStatistics } from "@/components/lazy/LazyWrapper";
+import VisitorStats from "@/components/stat/VisitStats";
+import { Suspense } from "react";
+import StatsSkeleton from "./StatsSkeleton";
+
+async function getVisitStats() {
+  const isDev = process.env.NODE_ENV === "development";
+  const baseUrl = isDev ? "http://localhost:3000" : process.env.NEXT_PUBLIC_BASE_URL;
+  const res = await fetch(`${baseUrl}/api/stats`, {
+    method: "GET",
+    next: { revalidate: 300 },
+  });
+
+  if (!res.ok) throw new Error("Failed to fetch stats");
+
+  return res.json();
+}
 
 export default function MainHeader() {
-  return (
-    <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-12">
-      {/* 타이틀과 배경 통계 데이터가 겹치는 영역 */}
-      <div className="relative pt-8 pb-12 sm:pt-12 sm:pb-20">
-        <LazyVisitStatistics />
+  const visitCountPromise = getVisitStats();
 
+  return (
+    <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-12 relative group">
+      <Suspense fallback={<StatsSkeleton />}>
+        <VisitorStats visitPromise={visitCountPromise} />
+      </Suspense>
+      <div className="relative pt-8 pb-12 sm:pt-12 sm:pb-20">
         <div className="relative z-10 pointer-events-none">
           <h1 className="text-5xl sm:text-8xl font-black tracking-tighter text-foreground mb-6 uppercase mix-blend-plus-lighter dark:mix-blend-lighten">
             keyboard hit!

@@ -1,57 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
-export default function VisitorStats() {
-  const [stats, setStats] = useState<{
-    totalViews: number;
-    dailyViews: number;
-    history: number[];
-  } | null>(null);
+interface Stats {
+  totalViews: number;
+  dailyViews: number;
+  history: number[];
+}
+
+interface VisitorStatsProps {
+  visitPromise: Promise<Stats>;
+}
+
+export default function VisitorStats({ visitPromise }: VisitorStatsProps) {
+  const initialStats = use(visitPromise);
+
+  const [stats, setStats] = useState<Stats>(initialStats);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
     const VISITED_KEY = `visited_at_${today}`;
-    const CACHE_KEY = `stats_cache_${today}`;
-    const CACHE_TIME = 5 * 60 * 1000;
-
-    const cachedItem = localStorage.getItem(CACHE_KEY);
     const hasVisitedToday = localStorage.getItem(VISITED_KEY);
 
-    if (cachedItem) {
-      try {
-        const { data, timestamp } = JSON.parse(cachedItem);
-        setStats(data);
-
-        // 오늘 이미 방문했었고, 캐시가 아직 유효하다면(5분 미만) fetch 생략
-        const isCacheValid = Date.now() - timestamp < CACHE_TIME;
-        if (hasVisitedToday && isCacheValid) return;
-      } catch (e) {
-        localStorage.removeItem(CACHE_KEY);
-      }
+    if (!hasVisitedToday) {
+      fetch("/api/stats", { method: "POST" })
+        .then((res) => res.json())
+        .then((data) => {
+          setStats(data);
+          localStorage.setItem(VISITED_KEY, "true");
+        })
+        .catch((err) => console.error("Stats update error:", err));
     }
 
     Object.keys(localStorage).forEach((key) => {
-      if (
-        (key.startsWith("visited_at_") || key.startsWith("stats_cache_")) &&
-        !key.includes(today)
-      ) {
+      if (key.startsWith("visited_at_") && !key.includes(today)) {
         localStorage.removeItem(key);
       }
     });
-
-    const method = hasVisitedToday ? "GET" : "POST";
-    fetch("/api/stats", { method })
-      .then((res) => res.json())
-      .then((data) => {
-        setStats(data);
-        localStorage.setItem(CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
-        if (method === "POST") localStorage.setItem(VISITED_KEY, "true");
-      })
-      .catch((err) => console.error("Stats fetch error:", err));
   }, []);
-
-  if (!stats) return null;
 
   const history = stats.history;
   const maxHistory = Math.max(...history, 1);
@@ -69,7 +55,7 @@ export default function VisitorStats() {
 
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none animate-fade-in">
-      <div className="absolute inset-0 opacity-10 sm:opacity-[0.2]">
+      <div className="absolute inset-0 opacity-30 px-4 sm:px-6 group-hover:opacity-70 transition-opacity duration-500">
         <svg
           viewBox="0 0 100 40"
           preserveAspectRatio="none"
@@ -99,9 +85,10 @@ export default function VisitorStats() {
             d={curvePath}
             fill="none"
             stroke="currentColor"
-            strokeWidth="0.4"
+            strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
+            style={{ vectorEffect: "non-scaling-stroke" }}
             className="text-primary"
           />
 
@@ -114,13 +101,13 @@ export default function VisitorStats() {
         </svg>
       </div>
 
-      <div className="absolute bottom-3 left-0 right-0 px-6 sm:flex justify-end gap-3 items-end opacity-60 hover:opacity-100 transition-opacity duration-500 hidden">
+      <div className="absolute bottom-3 left-0 right-3 px-6 flex justify-end gap-3 items-end opacity-60 group-hover:opacity-100 transition-opacity duration-500">
         <div className="flex flex-col gap-1">
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-primary ">
+            <span className="text-[8px] sm:text-[10px] font-bold text-primary ">
               지금까지 키보드를 두들겨준 분들
             </span>
-            <span className="text-3xl font-black ml-auto tabular-nums tracking-tighter text-foreground leading-none">
+            <span className="text-sm sm:text-3xl font-black ml-auto tabular-nums tracking-tighter text-foreground leading-none">
               {stats.totalViews.toLocaleString()}
             </span>
           </div>
@@ -128,8 +115,10 @@ export default function VisitorStats() {
 
         <div className="flex flex-col items-end text-right gap-1">
           <div className="flex flex-col items-end">
-            <span className="text-[10px] font-bold text-primary">오늘 키보드를 두들겨준 분들</span>
-            <span className="text-3xl  font-black tabular-nums tracking-tighter text-primary leading-none">
+            <span className="text-[8px] sm:text-[10px] font-bold text-primary">
+              오늘 키보드를 두들겨준 분들
+            </span>
+            <span className="text-sm sm:text-3xl font-black tabular-nums tracking-tighter text-primary leading-none">
               {stats.dailyViews.toLocaleString()}
             </span>
           </div>
