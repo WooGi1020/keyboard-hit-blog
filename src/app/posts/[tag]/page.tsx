@@ -13,13 +13,9 @@ export async function generateStaticParams() {
   const postMetaData = getPostMetaData();
   const tags = new Set(postMetaData.flatMap((post) => post.tags));
 
-  const paths = Array.from(tags).map((tag) => ({
+  return Array.from(tags).map((tag) => ({
     tag: tag,
   }));
-
-  paths.push({ tag: "all" });
-
-  return paths;
 }
 
 export async function generateMetadata({ params }: Props) {

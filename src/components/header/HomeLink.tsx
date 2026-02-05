@@ -10,12 +10,7 @@ export default function HomeLink({ pathname }: { pathname: string }) {
       title="메인 페이지 링크"
       className="group relative flex items-center justify-center w-28 h-10 transition-transform duration-300"
     >
-      <div
-        className={cn(
-          "absolute inset-x-1 h-10 bg-accent-foreground/20 dark:bg-muted/80 rounded-lg border-2 border-border/40",
-          pathname === "/" ? "border-foreground/10" : "border-transparent"
-        )}
-      />
+      <div className="absolute inset-x-1 h-10 bg-accent-foreground/20 dark:bg-muted/80 rounded-lg border-2 border-border/40" />
 
       <div className="absolute inset-x-1 inset-y-0 pointer-events-none overflow-hidden rounded-lg">
         <span

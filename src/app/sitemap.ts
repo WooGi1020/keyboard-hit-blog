@@ -23,8 +23,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     post.tags.map((tag) => ({
       url: `${baseUrl || "https://keyboard-hit-blog.vercel.app"}/posts/${tag}/${post.slug}`,
       lastModified: new Date(post.createdDate),
-      changeFrequency: "daily" as const, // 타입 안전성 확보
-      priority: 0.7,
+      changeFrequency: "daily" as const,
+      priority: 0.8,
     }))
   );
 

@@ -21,7 +21,7 @@ export default function Home() {
     <section className="flex flex-col w-full pb-20 pt-16 sm:pt-24">
       <MainHeader />
       <TagNav tagInfos={tagInfos} allTagCount={allTagCount} />
-      <Posts tag="all" posts={postMetaData} />
+      <Posts posts={postMetaData} />
     </section>
   );
 }

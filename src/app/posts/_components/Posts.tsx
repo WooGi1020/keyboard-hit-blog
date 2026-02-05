@@ -8,17 +8,13 @@ interface PostsProps {
 }
 
 function Posts({ tag, posts }: PostsProps) {
-  let filteredPosts = posts;
+  const filteredPosts = tag ? posts.filter((post) => post.tags.includes(tag)) : posts;
 
-  if (tag && tag !== "all") {
-    filteredPosts = filteredPosts.filter((post) => post.tags.includes(tag));
-  }
-
-  filteredPosts = [...filteredPosts].sort(
+  const sortedPosts = [...filteredPosts].sort(
     (a, b) => new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime()
   );
 
-  if (filteredPosts.length === 0) {
+  if (sortedPosts.length === 0) {
     notFound();
   }
 
@@ -26,21 +22,21 @@ function Posts({ tag, posts }: PostsProps) {
     <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6">
       <div className="flex flex-col gap-2">
         {/* Most Recent Post - Large Layout */}
-        <PostCard post={filteredPosts[0]} size="large" />
+        <PostCard post={sortedPosts[0]} size="large" />
 
         {/* Following 2 Posts - Medium/Grid Layout */}
-        {filteredPosts.length > 1 && (
+        {sortedPosts.length > 1 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
-            {filteredPosts.slice(1, 3).map((post) => (
+            {sortedPosts.slice(1, 3).map((post) => (
               <PostCard key={post.slug} post={post} size="medium" />
             ))}
           </div>
         )}
 
         {/* Rest of the Posts - Standard Grid Layout */}
-        {filteredPosts.length > 3 && (
+        {sortedPosts.length > 3 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-2">
-            {filteredPosts.slice(3).map((post) => (
+            {sortedPosts.slice(3).map((post) => (
               <PostCard key={post.slug} post={post} size="small" />
             ))}
           </div>

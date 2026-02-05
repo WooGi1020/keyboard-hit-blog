@@ -6,7 +6,6 @@ import { Toaster } from "sonner";
 import Footer from "@/components/footer/Footer";
 import type { Metadata } from "next";
 import META_DATA from "@/constant/META_DATA";
-import { GoogleAnalytics } from "@next/third-parties/google";
 
 const pretendardFont = localFont({
   src: "../../public/fonts/PretendardVariable.woff2",
@@ -26,8 +25,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
-
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${pretendardFont.className}`}>
@@ -38,7 +35,6 @@ export default function RootLayout({
           <Toaster />
         </ThemeProvider>
       </body>
-      {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
     </html>
   );
 }

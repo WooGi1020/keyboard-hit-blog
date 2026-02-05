@@ -11,9 +11,6 @@ importers:
       '@mdx-js/react':
         specifier: ^3.1.1
         version: 3.1.1(@types/react@19.2.7)(react@19.2.1)
-      '@next/third-parties':
-        specifier: ^16.0.7
-        version: 16.0.7(next@16.0.10(@babel/core@7.28.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react@19.2.1)
       '@radix-ui/react-avatar':
         specifier: ^1.1.11
         version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -102,6 +99,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.48.0
         version: 8.48.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)
+      baseline-browser-mapping:
+        specifier: ^2.9.19
+        version: 2.9.19
       eslint:
         specifier: ^9.39.1
         version: 9.39.1(jiti@2.6.1)
@@ -650,12 +650,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@next/third-parties@16.0.7':
-    resolution: {integrity: sha512-YZ1VNUCNIokMwt1PTXU+/ZcFZzRHEBZTNrjkVja58XNPWxogr30PpGhuJhDsj7StgKfAEjF0IsLTAAONMmMe4g==}
-    peerDependencies:
-      next: ^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0-beta.0
-      react: ^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0
-
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
     engines: {node: '>= 8'}
@@ -1192,8 +1186,8 @@ packages:
     resolution: {integrity: sha512-3XSA2cR/h/73EzlXXdU6YNycmYI7+kicTxks4eJg2g39biHR84slg2+des+p7iHYhbRg/udIS4TD53WabcOUkw==}
     engines: {node: '>= 0.4'}
 
-  baseline-browser-mapping@2.8.31:
-    resolution: {integrity: sha512-a28v2eWrrRWPpJSzxc+mKwm0ZtVx/G8SepdQZDArnXYU/XS+IF6mp8aB/4E+hH1tyGCoDo3KlUCdlSxGDsRkAw==}
+  baseline-browser-mapping@2.9.19:
+    resolution: {integrity: sha512-ipDqC8FrAl/76p2SSWKSI+H9tFwm7vYqXQrItCuiVPt26Km0jS+NzSsBWAaBusvSbQcfJG+JitdMm+wZAgTYqg==}
     hasBin: true
 
   brace-expansion@1.1.12:
@@ -2884,9 +2878,6 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  third-party-capital@1.0.20:
-    resolution: {integrity: sha512-oB7yIimd8SuGptespDAZnNkzIz+NWaJCu2RMsbs4Wmp9zSDUM8Nhi3s2OOcqYuv3mN4hitXc8DVx+LyUmbUDiA==}
-
   tiny-inflate@1.0.3:
     resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
 
@@ -3520,12 +3511,6 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.0.10':
     optional: true
 
-  '@next/third-parties@16.0.7(next@16.0.10(@babel/core@7.28.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react@19.2.1)':
-    dependencies:
-      next: 16.0.10(@babel/core@7.28.5)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
-      react: 19.2.1
-      third-party-capital: 1.0.20
-
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -4042,7 +4027,7 @@ snapshots:
 
   base64-js@0.0.8: {}
 
-  baseline-browser-mapping@2.8.31: {}
+  baseline-browser-mapping@2.9.19: {}
 
   brace-expansion@1.1.12:
     dependencies:
@@ -4059,7 +4044,7 @@ snapshots:
 
   browserslist@4.28.0:
     dependencies:
-      baseline-browser-mapping: 2.8.31
+      baseline-browser-mapping: 2.9.19
       caniuse-lite: 1.0.30001757
       electron-to-chromium: 1.5.260
       node-releases: 2.0.27
@@ -6367,8 +6352,6 @@ snapshots:
       acorn: 8.15.0
       commander: 2.20.3
       source-map-support: 0.5.21
-
-  third-party-capital@1.0.20: {}
 
   tiny-inflate@1.0.3: {}
 

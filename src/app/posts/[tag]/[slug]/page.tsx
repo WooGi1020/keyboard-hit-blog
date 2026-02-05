@@ -25,7 +25,6 @@ export async function generateMetadata({ params }: Props) {
     return getMetaData({
       title: "Page Not Found",
       description: "요청하신 포스트를 찾을 수 없습니다.",
-      asPath: `/posts/${tag}/${slug}`,
     });
   }
 
