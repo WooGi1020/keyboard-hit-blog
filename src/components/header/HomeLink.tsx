@@ -1,10 +1,22 @@
+"use client";
+
 import { Mouse } from "lucide-react";
 import { LazyLoadLottieKeyboard } from "../lazy/LazyWrapper";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export default function HomeLink({ pathname }: { pathname: string }) {
-  const isActive = pathname === "/";
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const segments = pathname.split("/").filter(Boolean);
+  const isActive = pathname === "/" || (pathname.startsWith("/posts") && segments.length <= 2);
+
+  const active = mounted && isActive;
 
   const lineBase = "absolute bg-foreground/50 transition-all duration-300";
 
@@ -12,7 +24,7 @@ export default function HomeLink({ pathname }: { pathname: string }) {
     <Link
       href="/"
       title="메인 페이지 링크"
-      data-active={isActive}
+      data-active={active}
       className="group relative flex items-center justify-center w-28 h-10 transition-transform duration-300"
     >
       <div className="absolute inset-x-1 h-10 bg-accent-foreground/20 dark:bg-muted/80 rounded-lg border-2 border-border/40" />

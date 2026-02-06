@@ -13,7 +13,8 @@ export const getMetaData = (metadataProps?: GenerateMetadataProps) => {
 
   const TITLE = title ? `${title} | 키보드 두들기며 먹고살기` : META_DATA.title || "";
   const DESCRIPTION = description || META_DATA.description || "";
-  const PAGE_URL = asPath || "";
+
+  const PAGE_URL = asPath ? (asPath.startsWith("/") ? asPath : `/${asPath}`) : "";
   const OG_IMAGE = ogImage || META_DATA.ogImage;
 
   const metadata: Metadata = {
@@ -22,28 +23,40 @@ export const getMetaData = (metadataProps?: GenerateMetadataProps) => {
       canonical: PAGE_URL,
     },
     title: TITLE,
-    icons: {
-      icon: "/favicon/favicon.ico",
-    },
     description: DESCRIPTION,
     keywords: [...META_DATA.keyword],
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+      },
+    },
     openGraph: {
       title: TITLE,
       description: DESCRIPTION,
-      siteName: TITLE,
+      siteName: "키보드 두들기며 먹고살기",
       locale: "ko_KR",
-      type: "website",
+      type: title ? "article" : "website",
       url: PAGE_URL,
-      images: {
-        url: OG_IMAGE,
-      },
+      images: [
+        {
+          url: OG_IMAGE,
+          width: 1200,
+          height: 630,
+          alt: TITLE,
+        },
+      ],
     },
     twitter: {
+      card: "summary_large_image",
       title: TITLE,
       description: DESCRIPTION,
-      images: {
-        url: OG_IMAGE,
-      },
+      images: [OG_IMAGE],
+    },
+    icons: {
+      icon: "/favicon/favicon.ico",
     },
   };
 
