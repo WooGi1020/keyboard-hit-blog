@@ -9,14 +9,24 @@ interface RollingNumberProps {
 }
 
 export default function RollingNumber({ value, className }: RollingNumberProps) {
+  const [mounted, setMounted] = useState(false);
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
+    setMounted(true);
     const timer = setTimeout(() => {
       setDisplayValue(value);
     }, 100);
     return () => clearTimeout(timer);
   }, [value]);
+
+  if (!mounted) {
+    return (
+      <div className={cn("flex items-center", className)}>
+        <span>0</span>
+      </div>
+    );
+  }
 
   const formatted = displayValue.toLocaleString();
   const characters = formatted.split("");
@@ -55,7 +65,7 @@ function Digit({ digit, delay }: { digit: number; delay: number }) {
   }, [digit, delay]);
 
   return (
-    <div className="relative inline-block h-[1em] w-[0.6em] sm:w-[0.55em] overflow-hidden leading-none tabular-nums">
+    <div className="relative inline-block h-[1em] w-[0.6em] sm:w-[0.6em] overflow-hidden leading-none tabular-nums">
       <div
         className="transition-transform flex flex-col items-center"
         style={{
