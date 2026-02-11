@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check, Copy } from "lucide-react";
 import { toast } from "sonner";
@@ -37,10 +37,15 @@ const extractTextFromChildren = (children: React.ReactNode): string => {
 
 export default function CustomCopyButton({ codeChildren }: CopyButtonProps) {
   const [isCopied, setIsCopied] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   const handleCopy = async () => {
-    // children prop에서 텍스트 콘텐츠를 추출
-    const code = extractTextFromChildren(codeChildren).trim();
+    const scope = buttonRef.current?.closest("[data-copy-scope]") as HTMLElement | null;
+    const pre = scope?.querySelector("[data-copy-target]") as HTMLElement | null;
+    const textFromDom = pre?.innerText;
+
+    // children prop에서 텍스트 콘텐츠를 추출 (fallback)
+    const code = (textFromDom || extractTextFromChildren(codeChildren)).trim();
 
     if (code) {
       try {
@@ -59,6 +64,7 @@ export default function CustomCopyButton({ codeChildren }: CopyButtonProps) {
       variant="ghost"
       size="icon"
       onClick={handleCopy}
+      ref={buttonRef}
       className="size-6 text-zinc-400 hover:bg-white/10 hover:text-zinc-100 transition-colors"
       aria-label="코드 복사"
     >

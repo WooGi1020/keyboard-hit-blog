@@ -45,7 +45,10 @@ function CustomPre({
   }
 
   return (
-    <div className="relative my-6 overflow-hidden rounded-xl bg-slate-100 dark:bg-zinc-900 shadow-xl dark:border-zinc-800 border border-slate-200">
+    <div
+      data-copy-scope
+      className="relative my-6 overflow-hidden rounded-xl bg-slate-100 dark:bg-zinc-900 shadow-xl dark:border-zinc-800 border border-slate-200"
+    >
       <div className="flex items-center justify-between bg-slate-200 dark:bg-[#282c34] px-4 py-3">
         <div className="flex gap-2 items-center">
           <div className="size-3 rounded-full bg-[#ff5f56]" />
@@ -61,6 +64,7 @@ function CustomPre({
 
       <div className="relative w-full overflow-x-auto">
         <pre
+          data-copy-target
           data-language={lang}
           {...props}
           style={{ ...style, backgroundColor: "transparent" }}
