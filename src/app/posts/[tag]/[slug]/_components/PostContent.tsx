@@ -12,7 +12,7 @@ function PostContent({ code }: PostContentProps) {
   return (
     <article className="relative w-full max-w-[900px] mx-auto">
       <CustomToc />
-      <div className="prose dark:prose-invert max-w-none">
+      <div className="prose dark:prose-invert max-w-none break-keep">
         <Component components={components} />
       </div>
     </article>

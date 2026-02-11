@@ -23,10 +23,10 @@ function PostMeta({ tag, slug }: PostMetaProps) {
     <div className="w-full mx-auto p-4">
       <div className="w-full mb-6">
         <p className="text-md text-chart-1 mb-2 text-center">{tag}</p>
-        <h1 className="text-4xl font-bold text-chart-2 mb-4 text-center max-sm:text-3xl">
+        <h1 className="text-4xl font-bold text-chart-2 mb-4 text-center max-sm:text-3xl break-keep">
           {post.title}
         </h1>
-        <p className="text-lg text-black dark:text-white text-center max-sm:text-[16px]">
+        <p className="text-lg text-black dark:text-white text-center max-sm:text-[16px] break-keep">
           {post.description}
         </p>
       </div>
