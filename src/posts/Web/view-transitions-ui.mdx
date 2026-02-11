@@ -1,0 +1,186 @@
+---
+title: View Transitions API로 자연스러운 화면 전환 만들기
+description: 웹에서도 페이지 전환 애니메이션을 네이티브처럼 구성하기
+tag: Web
+createdDate: 2026-02-11 14:20:00
+---
+
+<TOC />
+
+# ✨ 들어가며
+
+리액트가 최근 `<ViewTransition>` 컴포넌트를 실험적으로 제공하면서, 자연스럽게 `ViewTransitions API`에 대해 알게 되었다.**페이지 간 매끄러운 전환** 애니메이션을 지정하고, 이를 브라우저에 위임할 수 있다는 점이 흥미로웠다.
+**React/Next.js 환경**에서 어떻게 감싸서 사용해야 좋은지와 **실전에서 느낀점**을 정리해보고자 한다.
+
+## 🔗 View Transitions API란?
+
+브라우저가 **이전 화면과 다음 화면을 스냅샷으로 찍고** 그 사이를 애니메이션으로 **연결**해준다.
+기존에는 라우팅 전환에 애니메이션을 입히려면 **라우터 수준**에서 상태를 추가로 관리하거나 **Framer Motion**, **GSAP** 등의 애니메이션 라이브러리를 사용해야 했는데, 해당 API를 사용하면 **UI 변경 로직만 작성**하면 되고, 전환은 **브라우저가 알아서 처리**해준다.
+
+### 핵심 아이디어
+
+- UI 변경을 `document.startViewTransition()` 안에서 수행한다.
+- 변경 전/후를 브라우저가 관리하고, 우리는 CSS로 전환 방식을 정의한다.
+
+# ✨ 기본 사용법
+
+```ts
+// 간단한 예시
+function navigateWithTransition(next: () => void) {
+  if (!document.startViewTransition) {
+    next();
+    return;
+  }
+
+  document.startViewTransition(() => {
+    next();
+  });
+}
+```
+
+지원하지 않는 브라우저는 그냥 `next()`로 폴백한다.
+이 패턴은 **라우터 이동**, **상태 전환**, **탭 전환**에도 그대로 적용 가능하다.
+
+## 🔗 CSS로 전환 스타일 제어하기
+
+```css
+/* 기본적인 루트 페이드 전환 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.4s;
+  animation-timing-function: ease-in-out;
+}
+```
+
+- `root`에 대해 전환을 걸면 전체 페이지가 부드럽게 바뀐다.
+- 전환 효과를 **짝으로 정의**해야 시각적 깔끔함이 유지된다.
+
+## 🔗 Next.js(App Router)에서 쓰는 방식
+
+```find
+라우팅을 직접 제어하기보다는, "링크 클릭 시 전환을 감싼다"는 느낌으로 접근하는 게 편했다.
+```
+
+```tsx
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+function TransitionLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const router = useRouter();
+
+  const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+
+    const go = () => router.push(href);
+
+    if (!document.startViewTransition) {
+      go();
+      return;
+    }
+
+    document.startViewTransition(() => {
+      go();
+    });
+  };
+
+  return (
+    <Link href={href} onClick={onClick} className="transition-link">
+      {children}
+    </Link>
+  );
+}
+```
+
+`Link`를 감싸는 컴포넌트를 만들어두면, 필요한 곳에만 적용하기 쉽고, 페이지 전체 전환뿐 아니라 **부분 전환**(**탭 UI 등**)에도 응용 가능하다.
+혹은 아예 레이아웃에서 `provider`를 심어서 전역 관리하는 것도 고려해볼 수 있다.
+
+```tsx
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { flushSync } from "react-dom";
+
+export default function ViewTransitionProvider({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest("a");
+
+      // 내부 링크이고, _blank가 아닌 경우에만 가로채기
+      if (anchor && anchor.href.startsWith(window.location.origin) && !anchor.target) {
+        e.preventDefault();
+        const href = anchor.pathname;
+
+        if (!document.startViewTransition) {
+          router.push(href);
+          return;
+        }
+
+        document.startViewTransition(() => {
+          flushSync(() => {
+            router.push(href);
+          });
+        });
+      }
+    };
+
+    document.addEventListener("click", handleAnchorClick);
+    return () => document.removeEventListener("click", handleAnchorClick);
+  }, [router]);
+
+  return <>{children}</>;
+}
+```
+
+이와 같은 방식은 루트 레이아웃에서 `use client` 지시어를 사용한 **프로바이더**를 사용하므로 하위의 서버 컴포넌트가 동작이 깨질 수도 있다는 불안감이 있지만, `router.push`를 사용하면 서버로부터 데이터를 받아와 클라이언트 측의 **리액트 트리를 업데이트**하고, `startViewTransition`과 `flushSync`가 그 사이를 매끄럽게 연결해주기 때문에 큰 문제는 없다.
+
+## 🔗 React의 `<ViewTransition>` 컴포넌트와 연결해서 보기
+
+내부적으로는 `document.startViewTransition()`을 감싸서 **전환을 선언적으로 표현할 수 있게 해주는 래퍼**에 가깝다.
+즉, **DOM API 기반 접근과 목적은 동일**하고, **사용 방식만 선언적으로 바뀐 것**이다.
+
+```tsx
+import { ViewTransition } from "react";
+
+function Tabs({ tab }: { tab: "home" | "profile" }) {
+  return (
+    <ViewTransition name="tab">{tab === "home" ? <HomeTab /> : <ProfileTab />}</ViewTransition>
+  );
+}
+```
+
+`name`은 `view-transition-name`과 연결되는 키 역할을 한다.
+DOM API를 직접 쓰기 어렵거나, **컴포넌트 레벨 전환을 깔끔하게 표현하고 싶을 때** 유용하다.
+다만 **실험적 기능**이므로 실제 서비스에 도입할 때는 **폴백 전략**을 함께 설계하는 편이 안전하다. (부가적으로 구형 브라우저에선 StartViewTranstion API를 **지원하지 않는다.**)
+
+# ✨ 사용해보며 느낀 점
+
+### 1. 라우팅 전환은 짧고 가볍게
+
+- 길게 끌면 **UX**가 느려진다.
+- 150~250ms 정도가 체감상 가장 자연스러웠다.
+
+### 2. 전환 대상이 큰 화면일수록 효과가 크다
+
+- **리스트 → 상세, 홈 → 글 페이지**와 같은 화면 변화가 큰 플로우에서 가장 체감된다.
+- 작은 컴포넌트 전환은 오히려 과하면 **부자연**스럽다.
+
+### 3. 로딩 상태와 섞이면 더 자연스럽다
+
+- 전환 중 `skeleton`이나 `blur` 속성을 얹으면 시각적으로 끊김이 줄어든다.
+
+### 4. 지원 여부와 폴백
+
+- 크로미움 계열이 우선 지원 중이고, 사파리/파이어폭스는 단계적으로 도입되는 중이다.
+- 그래서 **폴백 처리는 무조건 필요**하다.
+- `document.startViewTransition` 존재 여부로 분기하면 안전하다.
+
+# ✨ 마치며
+
+> View Transitions API는 **프론트엔드에서 사용자의 "느낌"을 바꾸는 기술**이라 생각한다.
+> 비교적 최근에 출시한 기능이기도 하고 아직까지 사용 시의 이점이 크게 와닿지는 않지만, 앞으로의 **UX 향상**에 중요할 역할을 하겠다는 생각이 들었다.
