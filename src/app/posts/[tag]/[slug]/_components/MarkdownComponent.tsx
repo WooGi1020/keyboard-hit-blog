@@ -179,8 +179,7 @@ function CustomImg({ src, alt, width, height, ...props }: ImgProps) {
 
 function CustomCode({ children, className, ...props }: CodeProps) {
   const isBlock =
-    ("data-language" in props && props["data-language"] !== "text") ||
-    (typeof children === "string" && children.includes("\n"));
+    typeof children !== "string" || children.includes("\n");
 
   if (!isBlock) {
     return (
