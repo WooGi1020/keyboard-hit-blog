@@ -1,3 +1,21 @@
+export interface CareerProject {
+  name: string;
+  subtitle: string;
+  period: string;
+  stack: string[];
+  summary: string;
+  caseHref?: string;
+  caseTitle?: string;
+}
+
+export interface Career {
+  company: string;
+  role: string;
+  period: string;
+  summary: string;
+  projects: CareerProject[];
+}
+
 const ABOUT_ME = {
   name: "정우기",
   avatar: "https://avatars.githubusercontent.com/u/113000290?v=4",
@@ -10,35 +28,95 @@ const ABOUT_ME = {
   description:
     "기술의 원리를 깊이 파고들어 탐구하는 과정과 이를 함께 나누며 최적의 결과를 위한 답을 찾아가는 여정이 정말 흥미롭고 즐겁습니다.\n제가 얻은 인사이트를 투명하게 공유하고, 피드백을 주고받으며 동료와 함께 성장하는 커뮤니케이션을 지향합니다.\n이러한 과정들이 엔지니어로서 느끼는 가장 큰 보람이며, 몰입과 공유의 가치를 바탕으로 어제보다 더 나은 스스로가 되고자 합니다.",
 
+  careers: [
+    {
+      company: "(주)프롬프트타운",
+      role: "프론트엔드 엔지니어",
+      period: "2026.04 ~ 현재",
+      summary:
+        "AI 에이전트 플랫폼 Smoody를 만드는 회사에서 프론트엔드를 맡고 있습니다. 사용자가 에이전트와 대화하는 제품 화면부터, 사내 팀이 함께 쓰는 업무 도구와 여러 제품이 공유하는 디자인 기준까지, 화면과 관련된 일 전반을 담당했습니다.",
+      projects: [
+        {
+          name: "Smoody Platform FE",
+          subtitle: "에이전트와 대화하는 제품 화면과 실시간 통신 라이브러리",
+          period: "2026.04 ~ 현재",
+          stack: ["React", "TypeScript", "Vite", "SSE"],
+          summary:
+            "에이전트의 답변이 실시간으로 흘러오는 대화 화면을 만들었습니다. 네트워크가 잠시 끊기거나 사용자가 중간에 멈추는 상황에서도 화면이 잘못된 상태를 보여 주지 않도록, 연결 상태와 실행 상태를 구분해 다루는 구조를 설계했습니다.",
+          caseHref: "/posts/Portfolio/chat-runtime-connection-vs-run",
+          caseTitle: "연결 종료와 실행 종료를 구분한 대화 런타임 설계",
+        },
+        {
+          name: "Smoody Scouter",
+          subtitle: "사람과 에이전트가 함께 쓰는 마케팅 업무 도구",
+          period: "2026.10 ~ 현재",
+          stack: ["Next.js", "React", "PostgreSQL", "TypeScript"],
+          summary:
+            "에이전트가 만든 초안을 사람이 검토하고 승인한 뒤에만 발송되도록 하는 업무 흐름을 화면부터 서버, 데이터 저장까지 연결했습니다. 승인한 내용이 뒤늦게 바뀌거나 같은 작업이 중복 처리되는 문제를 막는 규칙을 만들었습니다.",
+          caseHref: "/posts/Portfolio/human-approval-and-agent-writes",
+          caseTitle: "사람의 승인과 에이전트 작업을 같은 데이터에서 관리하기",
+        },
+        {
+          name: "Smoody Design System",
+          subtitle: "여러 제품이 함께 쓰는 디자인 시스템",
+          period: "2026.09 ~ 현재",
+          stack: ["React", "Base UI", "Tailwind CSS", "Design Tokens"],
+          summary:
+            "색상과 간격 같은 디자인 기준을 한 곳에서 관리하고 코드로 배포하는 체계를 만들었습니다. 제품마다 요구가 달라지자, 모두가 공유할 것과 각 제품이 직접 가질 것의 경계를 다시 정해 운영 부담을 줄였습니다.",
+          caseHref: "/posts/Portfolio/design-system-product-owned-ui",
+          caseTitle: "공통 UI를 제품 소유 UI로 전환한 이유",
+        },
+      ],
+    },
+  ] satisfies Career[],
+
   skills: {
-    "Core Engineering": [
+    "Language & Framework": [
       "TypeScript",
-      "JavaScript(ES6+)",
-      "React",
-      "Next.js(App Router",
-      "Flutter",
+      "React 19",
+      "Vite",
+      "React Router 7",
+      "Next.js 16(App Router)",
     ],
-    "Data & State Management": ["Zustand", "Tanstack Query", "SSE(Server-Sent Events)"],
-    "Styling & Interaction": ["Tailwind CSS", "Framer Motion", "Shadcn UI", "Kakao Map API"],
-    "DevOps & Collaboration": ["Git & GitHub", "Vercel", "CI/CD(GitHub Actions)", "Edge Runtime"],
+    "Realtime & State": ["SSE(Server-Sent Events)", "useSyncExternalStore selector", "Zustand"],
+    "Server & Data": [
+      "Next.js Route Handler",
+      "PostgreSQL",
+      "트랜잭션·멱등 키·버전 충돌 설계",
+      "Zod → OpenAPI",
+    ],
+    "Test & Verification": ["Vitest", "Playwright", "axe-core", "설치 패키지 기준 소비자 스모크"],
+    "Package & Delivery": [
+      "pnpm/npm workspace",
+      "Vite lib 빌드",
+      "GitHub Packages",
+      "GitHub Actions",
+      "Vercel",
+    ],
+    "Design System": [
+      "Design Tokens 생성 파이프라인",
+      "Base UI",
+      "Tailwind CSS v4",
+      "CLI·MCP 문서 조회",
+    ],
   },
 
   project: [
     {
-      name: "Message-Bloom",
-      description: "봄날의 선물같은 메세지를 공유하는 웹서비스",
-      link: "https://github.com/WooGi1020/MessageBloom",
-      period: "2024-04-30 ~ 2024-05-17",
-      tag: ["React", "SCSS"],
-      src: "/images/project/messageBloom.png",
+      name: "Fresh Plate",
+      description: "비건 & 알러지인들을 위한 외식 정보 제공 플랫폼 (졸업 프로젝트, 팀장)",
+      link: "https://github.com/WooGi1020/fresh_plate",
+      period: "2025-03 ~ 2025-11",
+      tag: ["Next.js", "Tailwind", "Typescript", "Kakao-Map-API"],
+      src: "/images/project/freshPlate.png",
     },
     {
-      name: "Wiki-Viki",
-      description: "서로의 위키를 작성하고 공유하는 웹서비스",
-      link: "https://github.com/WooGi1020/wiki-viki",
-      period: "2024-06-21 ~ 2024-07-07",
-      tag: ["Next.js", "Tailwind", "Typescript"],
-      src: "/images/project/wikiViki.png",
+      name: "GachTaxi",
+      description: "가천대학교 학생들을 위한 택시 동승 서비스 (EventSourcePolyfill 기반 SSE 매칭)",
+      link: "https://github.com/WooGi1020/GachTaxi-FE",
+      period: "2024-12-14 ~ 2025-02-06",
+      tag: ["React", "Tailwind", "Typescript", "Framer-Motion", "SSE"],
+      src: "/images/project/gachtaxi.png",
     },
     {
       name: "Coworkers",
@@ -49,31 +127,47 @@ const ABOUT_ME = {
       src: "/images/project/coworkers.png",
     },
     {
-      name: "GachTaxi",
-      description: "가천대학교 학생들을 위한 택시 동승 서비스",
-      link: "https://github.com/WooGi1020/GachTaxi-FE",
-      period: "2024-12-14 ~ 2025-02-06",
-      tag: ["React", "Tailwind", "Typescript", "Framer-Motion"],
-      src: "/images/project/gachtaxi.png",
+      name: "Wiki-Viki",
+      description: "서로의 위키를 작성하고 공유하는 웹서비스",
+      link: "https://github.com/WooGi1020/wiki-viki",
+      period: "2024-06-21 ~ 2024-07-07",
+      tag: ["Next.js", "Tailwind", "Typescript"],
+      src: "/images/project/wikiViki.png",
     },
     {
-      name: "Fresh Plate",
-      description: "비건 & 알러지인들을 위한 외식 정보 제공 플랫폼 (졸업 프로젝트)",
-      link: "https://github.com/WooGi1020/fresh_plate",
-      period: "2024-05-24 ~ 2025-11-11",
-      tag: ["Next.js", "Tailwind", "Typescript", "Kakao-Map-API"],
-      src: "/images/project/freshPlate.png",
+      name: "Message-Bloom",
+      description: "봄날의 선물같은 메세지를 공유하는 웹서비스",
+      link: "https://github.com/WooGi1020/MessageBloom",
+      period: "2024-04-30 ~ 2024-05-17",
+      tag: ["React", "SCSS"],
+      src: "/images/project/messageBloom.png",
     },
   ],
 
   history: [
     {
-      do: "코드잇 스프린트 프론트엔드 6기",
+      do: "한신대학교 AI·SW 페스티벌 캡스톤 디자인 부문 입상",
+      period: "2025-11",
+    },
+    {
+      do: "정보처리기사 (한국산업인력공단)",
+      period: "2025-09",
+    },
+    {
+      do: "가천대학교 개발동아리 Leets 4기 (외부 협력 프론트엔드)",
+      period: "2024-12-18 ~ 2025-02-06",
+    },
+    {
+      do: "코드잇 스프린트 프론트엔드 엔지니어 6기 수료",
       period: "2024-03-07 ~ 2024-09-02",
     },
     {
-      do: "가천대학교 개발동아리 Leets 4기 (외부 협력)",
-      period: "2024-12-18 ~ 2025-02-06",
+      do: "SQLD (한국데이터산업진흥원)",
+      period: "2023-10",
+    },
+    {
+      do: "한신대학교 정보통신학부",
+      period: "2019-03 ~ 2026-02",
     },
   ],
 };
