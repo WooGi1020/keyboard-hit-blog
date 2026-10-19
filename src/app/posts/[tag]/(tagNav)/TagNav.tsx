@@ -2,8 +2,9 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
+import useHydrated from "@/hooks/useHydrated";
 
 interface TagInfo {
   tag: string;
@@ -12,10 +13,9 @@ interface TagInfo {
 
 export function TagNav({ tagInfos, allTagCount }: { tagInfos: TagInfo[]; allTagCount: number }) {
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useHydrated();
 
   useEffect(() => {
-    setMounted(true);
     const selectedLink = document.querySelector(`a[href='${pathname}']`);
     selectedLink?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
   }, [pathname]);

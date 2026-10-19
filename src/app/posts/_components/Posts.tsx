@@ -1,6 +1,6 @@
 import PostCard from "@/app/posts/_components/PostCard";
 import { notFound } from "next/navigation";
-import { getPostMetaData } from "@/utils/tagUtil";
+import type { getPostMetaData } from "@/utils/tagUtil";
 
 interface PostsProps {
   tag?: string;
