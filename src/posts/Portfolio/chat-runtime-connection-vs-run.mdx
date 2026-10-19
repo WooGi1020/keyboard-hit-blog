@@ -1,0 +1,209 @@
+---
+title: SSE 연결 종료와 AI 실행 종료를 구분한 대화 런타임 설계
+description: 끊긴 연결을 실행 완료로 오인해 생기던 잘못된 완료 알림과 후속 전송을, 연결 상태와 실행 상태를 분리한 상태 전이로 없앤 과정
+tag: Portfolio
+createdDate: 2026-10-19 21:00:00
+---
+
+<TOC />
+
+# 🧵 연결이 끊긴 것과 실행이 끝난 것은 다른 사건이다
+
+---
+
+## 🔗 맥락
+
+- Smoody Platform은 에이전트를 제작하고 실행하는 React 제품이다. 에이전트 실행과 도구 orchestration은 백엔드가 소유하고, 프론트엔드는 REST로 run을 시작한 뒤 세션 스코프 SSE 스트림으로 이벤트를 소비해 대화 화면을 그린다.
+- 이 사례는 그 소비 쪽, 즉 `@smoody/client-web-sdk`의 대화 런타임(controller)에서 다룬 문제다. 제품 앱은 React 19 · Vite · React Router 7 기반이고 SDK는 프레임워크에 의존하지 않는다.
+- 저는 이 제품의 프론트엔드 전반을 담당했다. 아래 내용은 제품 코드가 아니라 구조와 결정만 다룬다.
+
+## 🔗 문제 — 끊긴 연결이 "완료"로 보였다
+
+- 초기 구현은 SSE 스트림의 종료를 run의 종료로 취급했다. 서버가 `run.completed`를 보내든, 네트워크가 끊겨 reader가 닫히든 화면에서는 같은 "완료" 상태가 됐다.
+- 실제 사용자 보고로 드러난 증상은 세 가지였다.
+  - 연결만 끊겼는데 완료 알림이 뜨고, 사용자가 다음 메시지를 보내면 **진행 중인 run 위에 새 run이 겹쳤다.**
+  - 취소 버튼을 누르면 서버가 HTTP 202(접수)를 돌려주는데, 이것을 취소 완료로 간주해 **예약된 다음 전송이 바로 나갔다.**
+  - 사용자 입력을 기다리는 HIL(human-in-the-loop) 상태에서 스트림이 쉬고 있는 것을 종료로 오인해, 입력 카드가 사라졌다.
+- 공통 원인은 하나다. 전송 계층의 사건(연결 열림·닫힘)과 도메인의 사건(실행 시작·대기·취소·종결)을 같은 상태 하나에 넣고 있었다.
+
+## 🔗 제약
+
+- 서버 wire 계약은 바꿀 수 없었다. run 시작은 JSON ack(`accepted · runId · sessionId`)만 돌려주고, 이벤트는 세션 스트림으로만 온다. 취소와 HIL 응답도 202만 돌려준다.
+- 실측에서 `run.completed`만 도착하고 후속 commit 이벤트가 오지 않는 레이스, 첫 run이 `RUNNING`으로 수십 분 넘게 굳어 있는 stale run 등 서버 쪽 비정상 형태도 관측됐다. 런타임은 이것들을 믿지 않고 복구할 수 있어야 했다.
+- 초당 수십 회 도착하는 `text.delta`가 메시지 목록 같은 저빈도 컴포넌트를 리렌더하면 안 됐다.
+
+## 🔗 선택지
+
+| 선택지                                                               | 장점                                       | 버린 이유                                                                             |
+| -------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------- |
+| 스트림 종료 시 상태 조회(polling)로 보정                             | 구현이 작다                                | 끊김마다 조회가 늘고, 조회 결과가 도착하기 전까지 화면은 여전히 틀린 상태를 보여 준다 |
+| 모든 이벤트 핸들러에서 개별 예외 처리                                | 당장 증상은 막힌다                         | 수십 개의 핸들러가 각자 종료 판단을 하게 돼 정책이 흩어진다                           |
+| 연결 상태와 실행 상태를 분리하고, 전이는 서버 이벤트만 근거로 삼는다 | 정책이 한 곳에 모이고 복구 경로가 명확하다 | 상태 모델과 복구 코디네이터를 새로 설계해야 한다                                      |
+
+세 번째를 골랐다.
+
+## 🔗 결정 — 상태를 둘로 나누고, 종결은 서버 이벤트만 믿는다
+
+- **실행 상태(RunStatus)** 는 `idle · connecting · reasoning · streaming · tool_calling · awaiting_input · stopping · completed · error`처럼 도메인 사건으로만 바뀐다. 연결이 끊겨도 실행 상태는 바뀌지 않는다.
+- **연결 상태** 는 스트림 코디네이터가 따로 들고, 끊기면 세션 스트림 `resume`으로 다시 붙는다. 다른 경로(`respond()`나 `resume()`)가 이미 채널을 열었으면 그쪽을 쓴다.
+- **종결 커밋 가드**: raw terminal(`run.completed · run.error · run.cancelled`)을 관측한 뒤에만 미커밋 partial을 메시지로 확정하고 상태를 전이한다. 한 번 종결한 run은 다시 열리지 않는다.
+- **취소**: 202는 "접수"다. 상태는 `stopping`으로 가고, 서버가 `run.cancelled`를 보낼 때까지 예약 전송은 보류한다. 사용자 취소와 서버 취소는 이유(reason)를 구분해 기록한다.
+- **입력 대기**: 서버 상태가 `AWAITING_INTERACTION`이면 스트림이 조용해도 종료가 아니다. 입력 카드는 유지되고, `respond()`가 202를 받으면 후속 이벤트를 다시 세션 스트림에서 받는다.
+
+<svg
+  viewBox="0 0 760 400"
+  role="img"
+  aria-label="실행 상태 전이도: 연결 유실·입력 대기·취소 접수는 종결이 아니며, 종결은 서버의 terminal 이벤트로만 일어난다"
+  className="mx-auto my-10 w-full max-w-[760px] text-foreground"
+  fontFamily="inherit"
+  fontSize="13"
+>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+    </marker>
+  </defs>
+
+{/* 상단: 실행 상태 흐름 */}
+
+<g stroke="currentColor" strokeWidth="1.5" fill="none">
+  <rect x="20" y="60" width="110" height="44" rx="10" />
+  <rect x="190" y="60" width="130" height="44" rx="10" />
+  <rect x="380" y="60" width="150" height="44" rx="10" />
+  <rect
+    x="610"
+    y="60"
+    width="130"
+    height="44"
+    rx="10"
+    className="text-chart-1"
+    stroke="currentColor"
+    strokeWidth="2.5"
+  />
+</g>
+<g fill="currentColor" textAnchor="middle" fontWeight="600">
+  <text x="75" y="87">
+    idle
+  </text>
+  <text x="255" y="87">
+    connecting
+  </text>
+  <text x="455" y="87">
+    streaming · tool_calling
+  </text>
+  <text x="675" y="87">
+    completed · error
+  </text>
+</g>
+<g stroke="currentColor" strokeWidth="1.5" markerEnd="url(#arrow)">
+  <line x1="130" y1="82" x2="188" y2="82" />
+  <line x1="320" y1="82" x2="378" y2="82" />
+  <line x1="530" y1="82" x2="608" y2="82" />
+</g>
+<g fill="currentColor" fontSize="11" textAnchor="middle" opacity="0.8">
+  <text x="159" y="52">
+    sendMessage
+  </text>
+  <text x="349" y="52">
+    첫 이벤트
+  </text>
+  <text x="569" y="52">
+    run.completed / run.error
+  </text>
+</g>
+
+{/* 중단: 종결이 아닌 세 상태 */}
+
+<g stroke="currentColor" strokeWidth="1.5" fill="none" strokeDasharray="5 4">
+  <rect x="60" y="200" width="170" height="54" rx="10" />
+  <rect x="295" y="200" width="170" height="54" rx="10" />
+  <rect x="530" y="200" width="190" height="54" rx="10" />
+</g>
+<g fill="currentColor" textAnchor="middle" fontWeight="600">
+  <text x="145" y="223">
+    연결 유실
+  </text>
+  <text x="380" y="223">
+    awaiting_input (HIL)
+  </text>
+  <text x="625" y="223">
+    stopping (취소 202 접수)
+  </text>
+</g>
+<g fill="currentColor" textAnchor="middle" fontSize="11" opacity="0.8">
+  <text x="145" y="243">
+    실행 상태 유지 · resume 재연결
+  </text>
+  <text x="380" y="243">
+    스트림이 조용해도 종료 아님
+  </text>
+  <text x="625" y="243">
+    run.cancelled 전까지 전송 보류
+  </text>
+</g>
+
+{/* 중단 ↔ 상단 연결 */}
+
+<g stroke="currentColor" strokeWidth="1.5" fill="none" markerEnd="url(#arrow)">
+  <path d="M 420 104 C 300 140, 200 150, 150 198" />
+  <path d="M 170 200 C 230 150, 330 135, 440 106" strokeDasharray="5 4" />
+  <path d="M 455 104 L 400 198" />
+  <path d="M 410 200 L 470 106" strokeDasharray="5 4" />
+  <path d="M 490 104 C 560 140, 600 160, 615 198" />
+  <path d="M 650 198 C 670 160, 680 130, 680 106" strokeDasharray="5 4" />
+</g>
+<g fill="currentColor" fontSize="11" opacity="0.8">
+  <text x="236" y="150">
+    끊김
+  </text>
+  <text x="262" y="124">
+    재개(partial 보존)
+  </text>
+  <text x="352" y="165">
+    interaction
+  </text>
+  <text x="478" y="128">
+    respond 202
+  </text>
+  <text x="546" y="150">
+    cancel 202
+  </text>
+  <text x="686" y="150">
+    run.cancelled
+  </text>
+</g>
+
+{/* 하단: 규칙 */}
+
+  <g fill="currentColor" fontSize="12">
+    <text x="20" y="320" fontWeight="700">규칙</text>
+    <text x="20" y="342">① 점선 상태는 종결이 아니다. 실행 상태는 유지되고 연결만 복구한다.</text>
+    <text x="20" y="362">② 종결(실선 강조 상자)은 서버의 terminal 이벤트를 관측했을 때만 커밋한다. 한 번 종결한 run은 다시 열리지 않는다.</text>
+    <text x="20" y="382">③ 202는 접수다. 취소·응답 모두 후속 이벤트는 세션 스트림에서만 받는다.</text>
+  </g>
+</svg>
+
+## 🔗 구조 — 세 계층으로 나눈 SDK
+
+- **Streaming Core(`/streaming`)**: HTTP·인증 재시도·SSE 프레임 처리만 한다. 이벤트 이름·payload 검증·대화 모델·React·Zod에 의존하지 않는다. 다른 이벤트 어휘를 쓰는 서비스도 같은 reader를 쓸 수 있다.
+- **대화 런타임(controller)**: run 시작·SSE 구독·HIL·히스토리·재연결 복구를 하나의 스냅샷과 액션으로 묶는다. 상태는 SDK 자체 vanilla store가 소유해 React 없이도 동작한다.
+- **React selector**: `useSyncExternalStore` 위에서 스냅샷의 좁은 파생값만 구독한다. 전체 스냅샷을 구독하는 훅은 의도적으로 두지 않았다. delta storm에서 상위 트리를 깨우는 형태이기 때문이다.
+- 이 분리 덕분에 "연결은 코어, 실행 상태는 런타임, 리렌더 범위는 selector"로 책임이 한 곳씩만 생겼다. 이벤트 핸들러를 wire 어휘와 도메인 어휘로 분리한 과정은 [Translator + Dispatcher 패턴](/posts/React/event-translator-dispatcher-pattern) 글에 따로 적었다.
+
+## 🔗 확인 결과
+
+- 레이스 재현 테스트: `run.completed`만 도착하고 commit 이벤트가 없는 경우, terminal 뒤 첫 refetch로 canonical 메시지를 채우는 경로를 고정했다.
+- stale run 테스트: 서버가 `RUNNING`으로 굳은 run을 돌려줘도 그대로 믿지 않고 복구 경로로 들어가는지 확인했다.
+- 소비자 스모크: 실제로 설치한 패키지에서 React 없는 두 진입점과 React 18·19의 import·타입 소비를 검증한다. 최소 인증 import와 프레임 reader에 각각 수 KB 단위의 gzip 예산을 두었고, 실측이 그 아래에 있는지 CI가 확인한다.
+- 배포 구조: 한 파일로 묶인 dist에서는 모듈 최상위 스키마 생성이 tree-shaking되지 않아 상태 판별 함수 하나만 가져와도 수 KB가 따라왔다. 모듈 단위 출력(`preserveModules`)과 zod 없는 관측 모듈 분리 뒤에는 수백 B 수준이다. 앱 전체 번들 총량은 변경 전후 동일하다. 이 수치는 Vite 최소 소비 번들 기준이며 서비스 전체가 줄어든 것이 아니다.
+
+## 🔗 남은 제약
+
+- 대기 버퍼에는 조각 수와 총 크기 상한을 두었다. 상한을 넘는 폭주 스트림은 오류로 끝낸다.
+- 화면 전체의 렌더 시간 개선율은 따로 측정하지 않았다. 상위 트리의 불필요한 갱신을 줄이는 설계를 설명할 수 있을 뿐이다.
+- 관찰 가능한 이벤트(`observe`)는 현재 `asset.available` 하나다.
+
+## 🔗 면접에서 받을 질문에 대한 답
+
+- **왜 전체 snapshot 대신 selector인가?** 스트리밍 텍스트는 초당 수십 회 바뀌고 메시지 목록은 run당 몇 번만 바뀐다. 둘을 같은 구독으로 묶으면 느린 쪽이 빠른 쪽에 끌려간다.
+- **연결 종료와 실행 종료가 왜 다른가?** 연결은 클라이언트 사정으로도 끊긴다. 실행은 서버만 끝낼 수 있다. 클라이언트가 실행을 끝났다고 선언하는 순간 서버와 상태가 갈라진다.
