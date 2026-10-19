@@ -44,7 +44,7 @@ const ABOUT_ME = {
           summary:
             "에이전트의 답변이 실시간으로 흘러오는 대화 화면을 만들었습니다. 네트워크가 잠시 끊기거나 사용자가 중간에 멈추는 상황에서도 화면이 잘못된 상태를 보여 주지 않도록, 연결 상태와 실행 상태를 구분해 다루는 구조를 설계했습니다.",
           caseHref: "/posts/Portfolio/chat-runtime-connection-vs-run",
-          caseTitle: "연결 종료와 실행 종료를 구분한 대화 런타임 설계",
+          caseTitle: "SSE 연결이 끊긴 것과 실행이 끝난 것은 같은 사건일까?",
         },
         {
           name: "Smoody Scouter",
@@ -54,7 +54,7 @@ const ABOUT_ME = {
           summary:
             "에이전트가 만든 초안을 사람이 검토하고 승인한 뒤에만 발송되도록 하는 업무 흐름을 화면부터 서버, 데이터 저장까지 연결했습니다. 승인한 내용이 뒤늦게 바뀌거나 같은 작업이 중복 처리되는 문제를 막는 규칙을 만들었습니다.",
           caseHref: "/posts/Portfolio/human-approval-and-agent-writes",
-          caseTitle: "사람의 승인과 에이전트 작업을 같은 데이터에서 관리하기",
+          caseTitle: "승인 버튼을 눌렀을 때, 발송되는 건 정말 내가 본 그 초안일까?",
         },
         {
           name: "Smoody Design System",
@@ -64,7 +64,7 @@ const ABOUT_ME = {
           summary:
             "색상과 간격 같은 디자인 기준을 한 곳에서 관리하고 코드로 배포하는 체계를 만들었습니다. 제품마다 요구가 달라지자, 모두가 공유할 것과 각 제품이 직접 가질 것의 경계를 다시 정해 운영 부담을 줄였습니다.",
           caseHref: "/posts/Portfolio/design-system-product-owned-ui",
-          caseTitle: "공통 UI를 제품 소유 UI로 전환한 이유",
+          caseTitle: "공통 컴포넌트를 왜 다시 제품으로 돌려보냈을까?",
         },
       ],
     },

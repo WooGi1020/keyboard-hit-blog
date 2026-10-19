@@ -1,4 +1,5 @@
 import { Redis } from "@upstash/redis";
+import { unstable_cache } from "next/cache";
 
 export interface VisitStats {
   totalViews: number;
@@ -58,6 +59,15 @@ export async function getVisitStats(): Promise<VisitStats> {
     return EMPTY_STATS;
   }
 }
+
+/**
+ * 페이지(서버 컴포넌트)용 읽기. 정적 생성·ISR과 함께 쓰도록 Next 데이터 캐시에 5분 보관한다.
+ * Upstash 클라이언트의 fetch는 no-store라, 그대로 부르면 정적 렌더가 동적으로 바뀐다.
+ */
+export const getCachedVisitStats = unstable_cache(getVisitStats, ["visit-stats"], {
+  revalidate: 300,
+  tags: ["visit-stats"],
+});
 
 export async function recordVisit(ip: string): Promise<VisitStats> {
   const redis = getRedis();
