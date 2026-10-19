@@ -1,20 +1,22 @@
 "use client";
 
-import Lottie from "lottie-react";
+import { Lottie } from "lottie-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
-import animationData from "../../../public/lottie/animation.json";
-import whiteAnimationData from "../../../public/lottie/whiteAnimation.json";
+
+// JSON을 번들에 넣지 않고 public 경로에서 받아온다 (lottie-react 3의 `src`).
+const LIGHT_SRC = "/lottie/animation.json";
+const DARK_SRC = "/lottie/whiteAnimation.json";
 
 function LottieKeyboard({ className }: { className?: string }) {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   return (
     <div className={cn("flex items-center justify-center", className)}>
       <Lottie
+        src={resolvedTheme === "dark" ? DARK_SRC : LIGHT_SRC}
         autoplay
         loop
-        animationData={theme === "dark" ? whiteAnimationData : animationData}
         style={{ height: "100%", width: "100%" }}
       />
     </div>

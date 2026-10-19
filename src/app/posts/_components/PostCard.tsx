@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import getImagePath from "@/utils/getImagePath";
 import { Activity, useState } from "react";
-import { getPostMetaData } from "@/utils/tagUtil";
+import type { getPostMetaData } from "@/utils/tagUtil";
 import { getFormattedDate } from "@/utils/getDate";
 import { cn } from "@/lib/utils";
 

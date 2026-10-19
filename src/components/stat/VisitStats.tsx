@@ -3,12 +3,7 @@
 import { use, useEffect, useState } from "react";
 import RollingNumber from "./RollingNumber";
 import dayjs from "dayjs";
-
-interface Stats {
-  totalViews: number;
-  dailyViews: number;
-  history: number[];
-}
+import type { VisitStats as Stats } from "@/lib/stats";
 
 interface VisitorStatsProps {
   visitPromise: Promise<Stats>;
