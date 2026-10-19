@@ -1,6 +1,7 @@
 "use client";
 
-import { forwardRef, ComponentRef, ComponentPropsWithoutRef } from "react";
+import type { ComponentRef, ComponentPropsWithoutRef } from "react";
+import { forwardRef } from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
 import { cn } from "@/lib/utils";

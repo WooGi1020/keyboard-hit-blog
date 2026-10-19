@@ -4,14 +4,10 @@ import { Mouse } from "lucide-react";
 import { LazyLoadLottieKeyboard } from "../lazy/LazyWrapper";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import useHydrated from "@/hooks/useHydrated";
 
 export default function HomeLink({ pathname }: { pathname: string }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useHydrated();
 
   const segments = pathname.split("/").filter(Boolean);
   const isActive = pathname === "/" || (pathname.startsWith("/posts") && segments.length <= 2);

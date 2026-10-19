@@ -1,4 +1,5 @@
-import { Post, posts } from "#site/content";
+import type { Post } from "#site/content";
+import { posts } from "#site/content";
 
 type PostMetaData = Omit<Post, "code">;
 
@@ -21,5 +22,5 @@ export function getTagData() {
 }
 
 export function getPostMetaData(): PostMetaData[] {
-  return posts.map(({ code, ...meta }) => meta);
+  return posts.map(({ code: _code, ...meta }) => meta);
 }

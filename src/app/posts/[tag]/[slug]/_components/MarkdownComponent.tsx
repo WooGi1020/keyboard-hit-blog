@@ -1,8 +1,8 @@
 import CustomPre from "@/app/posts/[tag]/[slug]/_components/CustomPre";
 import Link from "next/link";
 import Image from "next/image";
-import { ComponentPropsWithoutRef } from "react";
-import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import type { ComponentPropsWithoutRef } from "react";
+import type { StaticImport } from "next/dist/shared/lib/get-img-props";
 
 type AnchorProps = ComponentPropsWithoutRef<"a">;
 type ImgProps = ComponentPropsWithoutRef<"img">;
@@ -170,16 +170,22 @@ function CustomImg({ src, alt, width, height, ...props }: ImgProps) {
         className="relative mx-auto mt-8 mb-2 aspect-video max-w-full rounded-2xl overflow-hidden"
         style={{ width, height }}
       >
-        <Image src={imgSrc} alt={alt || ""} layout="fill" priority objectFit="contain" {...props} />
+        <Image
+          src={imgSrc}
+          alt={alt || ""}
+          fill
+          sizes="(max-width: 800px) 100vw, 800px"
+          className="object-contain"
+          {...props}
+        />
       </div>
       <p className="text-center text-sm mb-8 text-muted-foreground">{alt}</p>
     </>
   );
 }
 
-function CustomCode({ children, className, ...props }: CodeProps) {
-  const isBlock =
-    typeof children !== "string" || children.includes("\n");
+function CustomCode({ children, ...props }: CodeProps) {
+  const isBlock = typeof children !== "string" || children.includes("\n");
 
   if (!isBlock) {
     return (

@@ -10,13 +10,10 @@ interface CopyButtonProps {
 }
 
 // props에 children이 포함되어 있는지 확인하는 타입 가드
-function hasChildrenProp(element: any): element is { props: { children: React.ReactNode } } {
-  return (
-    typeof element === "object" &&
-    element !== null &&
-    "props" in element &&
-    "children" in element.props
-  );
+function hasChildrenProp(element: unknown): element is { props: { children: React.ReactNode } } {
+  if (typeof element !== "object" || element === null || !("props" in element)) return false;
+  const { props } = element as { props: unknown };
+  return typeof props === "object" && props !== null && "children" in props;
 }
 
 const extractTextFromChildren = (children: React.ReactNode): string => {

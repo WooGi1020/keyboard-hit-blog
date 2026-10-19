@@ -1,4 +1,5 @@
-import { Link2, Github } from "lucide-react"; // GitHub, Mail 아이콘 추가
+import { Link2 } from "lucide-react";
+import GithubIcon from "@/components/icons/GithubIcon"; // GitHub, Mail 아이콘 추가
 import Link from "next/link";
 
 function FooterNav() {
@@ -12,7 +13,7 @@ function FooterNav() {
         aria-label="GitHub 프로필"
         className={iconClass}
       >
-        <Github className="size-5" />
+        <GithubIcon className="size-5" />
       </Link>
       <Link
         href="https://linktr.ee/woogi1020"

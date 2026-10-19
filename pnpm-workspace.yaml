@@ -1,0 +1,6 @@
+# pnpm 11은 허용 목록에 없는 의존성의 빌드 스크립트를 오류로 처리한다.
+# esbuild(velite)·sharp(next/image)는 필요하고, unrs-resolver(eslint resolver)는 미리 빌드된 바이너리로 충분하다.
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: false

@@ -48,7 +48,9 @@ function CustomToc() {
       })
     );
 
-    setTocItems(headers);
+    // DOM을 읽은 뒤 다음 프레임에 반영한다. effect 본문에서 동기적으로 setState하면
+    // 하이드레이션 직후 연쇄 렌더가 생긴다 (react-hooks/set-state-in-effect).
+    const frame = requestAnimationFrame(() => setTocItems(headers));
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -64,7 +66,10 @@ function CustomToc() {
     document
       .querySelectorAll("article div h1, article div h2")
       .forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
   }, []);
 
   // TOC 아이템이 없으면 렌더링 하지 않음 (선택 사항)

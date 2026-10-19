@@ -1,4 +1,5 @@
 import {
+  AboutCareer,
   AboutHistory,
   AboutMeta,
   AboutOpinion,
@@ -11,6 +12,7 @@ function AboutPage() {
     <div className="flex flex-col gap-16 w-full">
       <AboutMeta />
       <AboutOpinion />
+      <AboutCareer />
       <AboutSkills />
       <AboutProject />
       <AboutHistory />
