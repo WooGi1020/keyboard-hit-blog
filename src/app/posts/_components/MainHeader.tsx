@@ -1,22 +1,12 @@
-import VisitorStats from "@/components/stat/VisitStats";
 import { Suspense } from "react";
+import VisitorStats from "@/components/stat/VisitStats";
+import { getCachedVisitStats } from "@/lib/stats";
 import StatsSkeleton from "./StatsSkeleton";
 
-async function getVisitStats() {
-  const isDev = process.env.NODE_ENV === "development";
-  const baseUrl = isDev ? "http://localhost:3000" : process.env.NEXT_PUBLIC_BASE_URL;
-  const res = await fetch(`${baseUrl}/api/stats`, {
-    method: "GET",
-    next: { revalidate: 300 },
-  });
-
-  if (!res.ok) throw new Error("Failed to fetch stats");
-
-  return res.json();
-}
-
 export default function MainHeader() {
-  const visitCountPromise = getVisitStats();
+  // 서버 컴포넌트에서 저장소를 직접 읽는다. 자기 API를 다시 fetch하지 않으므로
+  // 배포 URL 환경 변수나 로컬 포트에 의존하지 않는다. 5분 캐시(ISR 주기와 동일).
+  const visitCountPromise = getCachedVisitStats();
 
   return (
     <div className="w-full max-w-[1240px] mx-auto px-4 sm:px-6 mb-12 relative group">

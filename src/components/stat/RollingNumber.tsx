@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import useHydrated from "@/hooks/useHydrated";
 
 interface RollingNumberProps {
   value: number;
@@ -9,18 +10,17 @@ interface RollingNumberProps {
 }
 
 export default function RollingNumber({ value, className }: RollingNumberProps) {
-  const [mounted, setMounted] = useState(false);
+  const hydrated = useHydrated();
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
-    setMounted(true);
     const timer = setTimeout(() => {
       setDisplayValue(value);
     }, 100);
     return () => clearTimeout(timer);
   }, [value]);
 
-  if (!mounted) {
+  if (!hydrated) {
     return (
       <div className={cn("flex items-center", className)}>
         <span>0</span>
@@ -55,7 +55,9 @@ export default function RollingNumber({ value, className }: RollingNumberProps) 
 }
 
 function Digit({ digit, delay }: { digit: number; delay: number }) {
+  // 무작위 값은 렌더마다 바뀌면 안 되므로 state 초기값으로 한 번만 정한다.
   const [position, setPosition] = useState(() => Math.floor(Math.random() * 10));
+  const [duration] = useState(() => 2000 + Math.random() * 1000);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -70,7 +72,7 @@ function Digit({ digit, delay }: { digit: number; delay: number }) {
         className="transition-transform flex flex-col items-center"
         style={{
           transform: `translateY(-${(position / 30) * 100}%)`,
-          transitionDuration: `${2000 + Math.random() * 1000}ms`,
+          transitionDuration: `${duration}ms`,
           transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
         }}
       >

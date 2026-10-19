@@ -5,8 +5,11 @@ import { getTagData } from "@/utils/tagUtil";
 import { getPostMetaData } from "@/utils/tagUtil";
 import MainHeader from "../_components/MainHeader";
 
+// 방문 통계를 5분마다 다시 읽는다 (예전 fetch의 next.revalidate와 같은 주기).
+export const revalidate = 300;
+
 type Props = {
-  params: { tag: string };
+  params: Promise<{ tag: string }>;
 };
 
 export async function generateStaticParams() {

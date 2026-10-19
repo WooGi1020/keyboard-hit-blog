@@ -1,6 +1,6 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ABOUT_ME from "@/constant/ABOUT_ME";
-import { MapIcon, Mail, Github, Globe } from "lucide-react";
+import { MapIcon, Mail } from "lucide-react";
+import GithubIcon from "@/components/icons/GithubIcon";
 import Link from "next/link";
 import FlippableAvatar from "./FlippableAvatar";
 
@@ -37,7 +37,7 @@ function AboutMeta() {
                 target="_blank"
                 className="flex items-center gap-1.5 hover:text-chart-1 transition-colors"
               >
-                <Github className="size-5" />
+                <GithubIcon className="size-5" />
                 <span className="text-sm font-medium">GitHub</span>
               </Link>
             </div>
@@ -48,10 +48,6 @@ function AboutMeta() {
           backSrc={ABOUT_ME.avatarBack}
           fallback={ABOUT_ME.name}
         />
-        {/* <Avatar className="size-32 max-sm:hidden border-2 border-chart-1 rounded-full p-1">
-          <AvatarImage src={ABOUT_ME.avatar} alt="아바타 이미지" />
-          <AvatarFallback>{ABOUT_ME.name}</AvatarFallback>
-        </Avatar> */}
       </div>
     </>
   );

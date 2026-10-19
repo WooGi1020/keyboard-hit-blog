@@ -1,17 +1,18 @@
 import { posts } from "#site/content";
 import type { MetadataRoute } from "next";
+import META_DATA from "@/constant/META_DATA";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? META_DATA.url;
 
 const defaultSiteMaps: MetadataRoute.Sitemap = [
   {
-    url: baseUrl || "https://keyboard-hit-blog.vercel.app",
+    url: baseUrl,
     lastModified: new Date(),
     changeFrequency: "daily",
     priority: 1,
   },
   {
-    url: `${baseUrl || "https://keyboard-hit-blog.vercel.app"}/about`,
+    url: `${baseUrl}/about`,
     lastModified: new Date(),
     changeFrequency: "daily",
     priority: 0.8,
@@ -21,7 +22,7 @@ const defaultSiteMaps: MetadataRoute.Sitemap = [
 export default function sitemap(): MetadataRoute.Sitemap {
   const sitemapFromPosts: MetadataRoute.Sitemap = posts.flatMap((post) =>
     post.tags.map((tag) => ({
-      url: `${baseUrl || "https://keyboard-hit-blog.vercel.app"}/posts/${tag}/${post.slug}`,
+      url: `${baseUrl}/posts/${tag}/${post.slug}`,
       lastModified: new Date(post.createdDate),
       changeFrequency: "daily" as const,
       priority: 0.8,
