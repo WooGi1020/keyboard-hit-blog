@@ -7,12 +7,16 @@ createdDate: 2026-02-11 14:20:00
 
 <TOC />
 
-# ✨ 들어가며
+<span id="-들어가며" className="heading-alias" aria-hidden="true" />
+
+# 들어가며
 
 리액트가 최근 `<ViewTransition>` 컴포넌트를 실험적으로 제공하면서, 자연스럽게 `ViewTransitions API`에 대해 알게 되었다.**페이지 간 매끄러운 전환** 애니메이션을 지정하고, 이를 브라우저에 위임할 수 있다는 점이 흥미로웠다.
 **React/Next.js 환경**에서 어떻게 감싸서 사용해야 좋은지와 **실전에서 느낀점**을 정리해보고자 한다.
 
-## 🔗 View Transitions API란?
+<span id="-view-transitions-api란" className="heading-alias" aria-hidden="true" />
+
+## View Transitions API란?
 
 브라우저가 **이전 화면과 다음 화면을 스냅샷으로 찍고** 그 사이를 애니메이션으로 **연결**해준다.
 기존에는 라우팅 전환에 애니메이션을 입히려면 **라우터 수준**에서 상태를 추가로 관리하거나 **Framer Motion**, **GSAP** 등의 애니메이션 라이브러리를 사용해야 했는데, 해당 API를 사용하면 **UI 변경 로직만 작성**하면 되고, 전환은 **브라우저가 알아서 처리**해준다.
@@ -22,7 +26,9 @@ createdDate: 2026-02-11 14:20:00
 - UI 변경을 `document.startViewTransition()` 안에서 수행한다.
 - 변경 전/후를 브라우저가 관리하고, 우리는 CSS로 전환 방식을 정의한다.
 
-# ✨ 기본 사용법
+<span id="-기본-사용법" className="heading-alias" aria-hidden="true" />
+
+# 기본 사용법
 
 ```ts
 // 간단한 예시
@@ -41,7 +47,9 @@ function navigateWithTransition(next: () => void) {
 지원하지 않는 브라우저는 그냥 `next()`로 폴백한다.
 이 패턴은 **라우터 이동**, **상태 전환**, **탭 전환**에도 그대로 적용 가능하다.
 
-## 🔗 CSS로 전환 스타일 제어하기
+<span id="-css로-전환-스타일-제어하기" className="heading-alias" aria-hidden="true" />
+
+## CSS로 전환 스타일 제어하기
 
 ```css
 /* 기본적인 루트 페이드 전환 */
@@ -55,7 +63,9 @@ function navigateWithTransition(next: () => void) {
 - `root`에 대해 전환을 걸면 전체 페이지가 부드럽게 바뀐다.
 - 전환 효과를 **짝으로 정의**해야 시각적 깔끔함이 유지된다.
 
-## 🔗 Next.js(App Router)에서 쓰는 방식
+<span id="-nextjsapp-router에서-쓰는-방식" className="heading-alias" aria-hidden="true" />
+
+## Next.js(App Router)에서 쓰는 방식
 
 ```find
 라우팅을 직접 제어하기보다는, "링크 클릭 시 전환을 감싼다"는 느낌으로 접근하는 게 편했다.
@@ -139,7 +149,13 @@ export default function ViewTransitionProvider({ children }: { children: React.R
 
 이와 같은 방식은 루트 레이아웃에서 `use client` 지시어를 사용한 **프로바이더**를 사용하므로 하위의 서버 컴포넌트가 동작이 깨질 수도 있다는 불안감이 있지만, `router.push`를 사용하면 서버로부터 데이터를 받아와 클라이언트 측의 **리액트 트리를 업데이트**하고, `startViewTransition`과 `flushSync`가 그 사이를 매끄럽게 연결해주기 때문에 큰 문제는 없다.
 
-## 🔗 React의 `<ViewTransition>` 컴포넌트와 연결해서 보기
+<span
+  id="-react의-viewtransition-컴포넌트와-연결해서-보기"
+  className="heading-alias"
+  aria-hidden="true"
+/>
+
+## React의 `<ViewTransition>` 컴포넌트와 연결해서 보기
 
 내부적으로는 `document.startViewTransition()`을 감싸서 **전환을 선언적으로 표현할 수 있게 해주는 래퍼**에 가깝다.
 즉, **DOM API 기반 접근과 목적은 동일**하고, **사용 방식만 선언적으로 바뀐 것**이다.
@@ -158,7 +174,9 @@ function Tabs({ tab }: { tab: "home" | "profile" }) {
 DOM API를 직접 쓰기 어렵거나, **컴포넌트 레벨 전환을 깔끔하게 표현하고 싶을 때** 유용하다.
 다만 **실험적 기능**이므로 실제 서비스에 도입할 때는 **폴백 전략**을 함께 설계하는 편이 안전하다. (부가적으로 구형 브라우저에선 StartViewTranstion API를 **지원하지 않는다.**)
 
-# ✨ 사용해보며 느낀 점
+<span id="-사용해보며-느낀-점" className="heading-alias" aria-hidden="true" />
+
+# 사용해보며 느낀 점
 
 ### 1. 라우팅 전환은 짧고 가볍게
 
@@ -180,7 +198,9 @@ DOM API를 직접 쓰기 어렵거나, **컴포넌트 레벨 전환을 깔끔하
 - 그래서 **폴백 처리는 무조건 필요**하다.
 - `document.startViewTransition` 존재 여부로 분기하면 안전하다.
 
-# ✨ 마치며
+<span id="-마치며" className="heading-alias" aria-hidden="true" />
+
+# 마치며
 
 > View Transitions API는 **프론트엔드에서 사용자의 "느낌"을 바꾸는 기술**이라 생각한다.
 > 비교적 최근에 출시한 기능이기도 하고 아직까지 사용 시의 이점이 크게 와닿지는 않지만, 앞으로의 **UX 향상**에 중요할 역할을 하겠다는 생각이 들었다.

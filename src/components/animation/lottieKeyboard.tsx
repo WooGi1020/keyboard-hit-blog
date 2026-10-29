@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 
 // JSON을 번들에 넣지 않고 public 경로에서 받아온다 (lottie-react 3의 `src`).
-const LIGHT_SRC = "/lottie/animation.json";
-const DARK_SRC = "/lottie/whiteAnimation.json";
+const LIGHT_SRC = "/lottie/keyboard-paper.json";
+const DARK_SRC = "/lottie/keyboard-paper-dark.json?v=2";
 
 function LottieKeyboard({ className }: { className?: string }) {
   const { resolvedTheme } = useTheme();

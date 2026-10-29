@@ -4,7 +4,7 @@ import PostMeta from "@/app/posts/[tag]/[slug]/_components/PostMeta";
 import PostContent from "@/app/posts/[tag]/[slug]/_components/PostContent";
 import getImagePath from "@/utils/getImagePath";
 
-import { LazyLoadLottieMonitor, LazyLoadGiscus } from "@/components/lazy/LazyWrapper";
+import { LazyLoadGiscus } from "@/components/lazy/LazyWrapper";
 import { getFormattedDate } from "@/utils/getDate";
 
 interface Params {
@@ -32,7 +32,12 @@ export async function generateMetadata({ params }: Props) {
     title: post.title,
     description: post.description!,
     asPath: `/posts/${tag}/${slug}`,
-    ogImage: getImagePath(post.title, tag, formattedDate),
+    ogImage: getImagePath(
+      post.title,
+      tag,
+      formattedDate,
+      post.updatedDate ? getFormattedDate(post.updatedDate, "YYYY-MM-DD") : undefined
+    ),
   });
 }
 
@@ -54,14 +59,12 @@ async function PostPage({ params }: Props) {
   if (!post) return null;
 
   return (
-    <section className="flex flex-col gap-6 w-full max-w-[800px] mx-auto">
-      <div className="min-h-20 mx-auto max-sm:-mb-4">
-        <LazyLoadLottieMonitor />
-      </div>
+    <section className="post-page">
       <PostMeta tag={tag} slug={slug} />
-      <div className="border dark:border-gray-500 border-gray-400 -mb-5" />
-      <PostContent code={post.code} />
-      <LazyLoadGiscus />
+      <PostContent key={post.slug} code={post.code} />
+      <section id="post-comments" className="post-comments" aria-label="댓글" tabIndex={-1}>
+        <LazyLoadGiscus />
+      </section>
     </section>
   );
 }

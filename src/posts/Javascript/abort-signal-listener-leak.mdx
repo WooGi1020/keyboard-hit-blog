@@ -1,19 +1,34 @@
 ---
-title: "AbortSignal 리스너가 조용히 새는 자리 — { once: true } 의 함정"
+title: AbortSignal 리스너 누수 잡기
 description: 정상 종료 경로에서 addEventListener 가 해제되지 않아 생기는 리스너 누수와, 이를 선언적으로 정리하는 법
 tag: Javascript
 createdDate: 2026-07-23 20:10:00
+updatedDate: 2026-10-29
 ---
 
 <TOC />
 
-# 🧯 `{ once: true }` 를 걸었는데 왜 리스너가 남아 있을까?
+<span
+  id="--once-true--를-걸었는데-왜-리스너가-남아-있을까"
+  className="heading-alias"
+  aria-hidden="true"
+/>
+
+# `{ once: true }` 를 걸었는데 왜 리스너가 남아 있을까?
 
 ---
 
-## 🔗 들어가며
+<span id="-들어가며" className="heading-alias" aria-hidden="true" />
 
-### ✨ 스트림 유틸의 자원 정리를 점검하다 만난 것
+## 들어가며
+
+<span
+  id="-스트림-유틸의-자원-정리를-점검하다-만난-것"
+  className="heading-alias"
+  aria-hidden="true"
+/>
+
+### 스트림 유틸의 자원 정리를 점검하다 만난 것
 
 - 최근 실시간 스트림을 감싸는 작은 유틸의 **자원 수명**을 점검하고 있었다.
 
@@ -33,9 +48,17 @@ externalSignal.addEventListener("abort", onAbort, { once: true });
 
 ---
 
-## 🔗 문제의 구조 — 외부 signal 을 내부로 이어붙이기
+<span
+  id="-문제의-구조--외부-signal-을-내부로-이어붙이기"
+  className="heading-alias"
+  aria-hidden="true"
+/>
 
-### 🧩 흔한 브리지 패턴
+## 문제의 구조 — 외부 signal 을 내부로 이어붙이기
+
+<span id="-흔한-브리지-패턴" className="heading-alias" aria-hidden="true" />
+
+### 흔한 브리지 패턴
 
 - 스트림/리더 같은 유틸은 종종 외부의 취소 신호(`AbortSignal`)를 받아, 내부 취소 컨트롤러로 **이어붙인다**.
 
@@ -68,7 +91,9 @@ function createStream(source, { signal } = {}) {
 
 - 겉보기엔 멀쩡하다. `{ once: true }` 도 붙어 있으니 리스너 정리도 신경 쓴 것처럼 보인다.
 
-### 🤔 그런데 `{ once: true }` 는 언제 떨어지나?
+<span id="-그런데--once-true--는-언제-떨어지나" className="heading-alias" aria-hidden="true" />
+
+### 그런데 `{ once: true }` 는 언제 떨어지나?
 
 - MDN 을 다시 읽어보면 정의가 생각보다 좁다.
 
@@ -87,9 +112,13 @@ function createStream(source, { signal } = {}) {
 
 ---
 
-## 🔗 왜 로컬에선 안 보였나 — 누수의 조건
+<span id="-왜-로컬에선-안-보였나--누수의-조건" className="heading-alias" aria-hidden="true" />
 
-### 🕵️ 짧은 수명이 증상을 가린다
+## 왜 로컬에선 안 보였나 — 누수의 조건
+
+<span id="️-짧은-수명이-증상을-가린다" className="heading-alias" aria-hidden="true" />
+
+### 짧은 수명이 증상을 가린다
 
 - 이 누수는 아무 상황에서나 터지지 않는다. 두 조건이 겹쳐야 한다.
 
@@ -116,7 +145,9 @@ for (const turn of turns) {
 
 - 정상 종료가 한 번 일어날 때마다 `sessionAbort.signal` 에 리스너가 **한 개씩 순증**한다. 세션이 길수록 조용히 쌓인다.
 
-### 🔎 확인하는 법
+<span id="-확인하는-법" className="heading-alias" aria-hidden="true" />
+
+### 확인하는 법
 
 - 크롬 콘솔에서 특정 노드/타깃의 리스너를 직접 셀 수 있다.
 
@@ -129,9 +160,13 @@ getEventListeners(sessionAbort.signal).abort?.length;
 
 ---
 
-## 🔗 고치기 — 종료 경로에서 명시적으로 뗀다
+<span id="-고치기--종료-경로에서-명시적으로-뗀다" className="heading-alias" aria-hidden="true" />
 
-### 1️⃣ 핸들러 참조를 잡고, 종료 퍼널에서 해제
+## 고치기 — 종료 경로에서 명시적으로 뗀다
+
+<span id="1️⃣-핸들러-참조를-잡고-종료-퍼널에서-해제" className="heading-alias" aria-hidden="true" />
+
+### 1. 핸들러 참조를 잡고, 종료 퍼널에서 해제
 
 - 첫 번째 수정은 단순하다. 익명 함수 대신 **참조를 잡아두고**, 모든 종료가 수렴하는 `resolveDone` 에서 명시적으로 뗀다.
 
@@ -159,7 +194,13 @@ function resolveDone(result) {
 
 - 그리고 `removeEventListener` 는 **멱등**하다. 외부 signal 이 이미 발화해서 리스너가 자동 제거된 뒤에 다시 불러도 조용한 no-op 이라, "발화했을 수도 / 아닐 수도" 를 신경 쓸 필요가 없다.
 
-### 2️⃣ 더 깔끔한 방법 — addEventListener 자신의 `signal` 옵션
+<span
+  id="2️⃣-더-깔끔한-방법--addeventlistener-자신의-signal-옵션"
+  className="heading-alias"
+  aria-hidden="true"
+/>
+
+### 2. 더 깔끔한 방법 — addEventListener 자신의 `signal` 옵션
 
 - 사실 `addEventListener` 에는 리스너 해제를 **선언적으로** 위임하는 옵션이 있다. 세 번째 인자의 `signal` 이다.
 
@@ -190,9 +231,13 @@ if (signal) {
 
 ---
 
-## 🔗 남는 교훈
+<span id="-남는-교훈" className="heading-alias" aria-hidden="true" />
 
-### 💡 `{ once: true }` 는 정리 전략이 아니다
+## 남는 교훈
+
+<span id="--once-true--는-정리-전략이-아니다" className="heading-alias" aria-hidden="true" />
+
+### `{ once: true }` 는 정리 전략이 아니다
 
 - `once` 는 **발화 횟수 보장**이지, **수명 관리**가 아니다.
 
@@ -203,7 +248,9 @@ if (signal) {
   - 종료가 수렴하는 지점에서 `removeEventListener` 를 직접 부르거나,
   - `addEventListener(..., { signal })` 로 "이 신호가 죽으면 떼라" 를 선언해두거나.
 
-### 🤔 비슷한 코드를 짜고 있다면
+<span id="-비슷한-코드를-짜고-있다면" className="heading-alias" aria-hidden="true" />
+
+### 비슷한 코드를 짜고 있다면
 
 - 외부 `AbortSignal` 을 받아 내부로 브리지하는 유틸을 짜고 있다면, 다음 질문을 던져보면 좋겠다.
 

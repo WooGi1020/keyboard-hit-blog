@@ -7,7 +7,9 @@ createdDate: 2026-02-03 16:00:00
 
 <TOC />
 
-# ✨ 들어가며
+<span id="-들어가며" className="heading-alias" aria-hidden="true" />
+
+# 들어가며
 
 최근 React 생태계는 **어떻게(How) 데이터를 가져올 것인가** 보다 **무엇을(What) 보여줄 것인가** 에 집중하는 방향으로 진화하고 있다.
 
@@ -16,7 +18,9 @@ createdDate: 2026-02-03 16:00:00
 
 이번에 졸업 작품인 [Fresh-Plate](https://github.com/WooGi1020/fresh_plate) 페이지의 비동기 `fetch` 로직을 `use` + `Suspense`조합으로 변경하며 겪은 시행착오를 정리해보고자 한다.
 
-## 🔗 고전적인 방식: 명령형 데이터 페칭
+<span id="-고전적인-방식-명령형-데이터-페칭" className="heading-alias" aria-hidden="true" />
+
+## 고전적인 방식: 명령형 데이터 페칭
 
 가장 흔히 사용되던 방식은 컴포넌트 마운트 시점에 `useEffect`에서 비동기 요청을 수행하고 이를 `useState`로 관리하는 패턴이다.
 
@@ -46,7 +50,9 @@ return <div>{data.name}</div>;
 >
 > 사실 이러면 안되는데 시간도 촉박하고 졸업 작품의 압박감 때문에 실험적인 코드보다 익숙한 방식을 택했었다.
 
-## 🔗 현대적인 방식: use 훅과 Suspense
+<span id="-현대적인-방식-use-훅과-suspense" className="heading-alias" aria-hidden="true" />
+
+## 현대적인 방식: use 훅과 Suspense
 
 이제 학기도 마쳤겠다 기존의 불필요하게 번들 사이즈를 키우는 라이브러리들을 걷어내고, React 18+의 `use` 훅과 `Suspense`를 활용한 선언적 데이터 페칭으로 리팩토링을 시도했다.
 
@@ -88,7 +94,9 @@ const reviewsPromise = useMemo(
 - 로딩 UI는 `Suspense` 경계에서 한 번만 정의하면 되므로, **중복 코드 제거** 및 **재사용성 향상**
 - `use` 훅을 통해 비동기 호출 결과를 변수에 바로 할당하는 것처럼 쓸 수 있어 가독성을 향상시키고 보다 동기적인 코드처럼 작성 가능
 
-## 🔗 실전에서 만난 문제들
+<span id="-실전에서-만난-문제들" className="heading-alias" aria-hidden="true" />
+
+## 실전에서 만난 문제들
 
 ### 1. Promise 무한 루프
 
@@ -127,7 +135,9 @@ Activity 함수는 가급적이면 내부에 페칭 로직을 포함하지 않�
 
 이를 해결하기 위해 위에 작성했던 **Next.js**의 `Route Handler`를 활용하여 데이터 조회 로직을 구성하고 실질적으로 변경을 수행하는 함수만 **Server Action**으로 분리하는 방식을 택했다.
 
-## 🔗 결론
+<span id="-결론" className="heading-alias" aria-hidden="true" />
+
+## 결론
 
 ```find
 선언적 프로그래밍은 코드를 줄이기 위한 기법이 아니라, 데이터 흐름을 더 예측 가능하게 만들기 위한 설계 방식이다.

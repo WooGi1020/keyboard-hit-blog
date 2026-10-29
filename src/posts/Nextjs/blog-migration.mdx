@@ -7,14 +7,18 @@ createdDate: 2025-11-27 21:46:14
 
 <TOC />
 
-# 🚀 마이그레이션을 해봅시다!
+<span id="-마이그레이션을-해봅시다" className="heading-alias" aria-hidden="true" />
+
+# 마이그레이션을 해봅시다!
 
 - 기존 블로그는 Next.js 14 환경에서 fs, glob, gray-matter, next-mdx-remote를 조합하여 구축하는 형태
 - 파일 시스템에 직접 접근하여 MDX 파일을 읽고 파싱하는 고전적인 방식은 직관적이지만, 여러 가지 문제점이 있었고 Next 버전을 업그레이드하면서 겸사겸사 모던한 방식도 경험해보고 싶어졌다.
 
 > 이번 리팩토링의 핵심은 "콘텐츠를 데이터로 취급"하는 아키텍처로의 전환이며, 이를 위해 Velite를 도입했다.
 
-## 🛠️ 레거시: 파일 시스템 기반 접근의 한계
+<span id="️-레거시-파일-시스템-기반-접근의-한계" className="heading-alias" aria-hidden="true" />
+
+## 레거시: 파일 시스템 기반 접근의 한계
 
 - 기존 방식은 런타임 혹은 빌드 타임에 Node.js API를 통해 직접 파일을 핸들링해야 했다.
 
@@ -140,7 +144,9 @@ export const getAllTag = () => {
 
 - readingTime 계산이나 날짜 포맷팅 같은 로직이 컴포넌트 내부나 유틸리티 함수에 산재되어 있어서 렌더링 시점에 연산을 수행하게 되어 불필요한 오버헤드를 유발했다.
 
-## ✨ 솔루션: Velite 도입
+<span id="-솔루션-velite-도입" className="heading-alias" aria-hidden="true" />
+
+## 솔루션: Velite 도입
 
 - Velite는 콘텐츠를 빌드 타임에 타입 안전한 JSON 데이터로 변환해주는 `Content Layer` 도구이며, 기존 빌드타임 변환 라이브러리인 `ContentLayer`의 유지보수가 중단된 시점에서 가장 강력한 대안
 
@@ -186,7 +192,9 @@ export default defineConfig({
 
 - 기존에 컴포넌트 레벨에서 수행하던 readingTime 계산이나 slug 가공 로직을 transform 단계로 이동시킴으로써, 데이터를 완벽하게 가공한 채로 사용할 수 있게 되었다.
 
-## 📈 아키텍처 변화 및 이점
+<span id="-아키텍처-변화-및-이점" className="heading-alias" aria-hidden="true" />
+
+## 아키텍처 변화 및 이점
 
 ### 1. Zero Runtime Overhead
 
@@ -226,7 +234,9 @@ posts.map((post) => (
 - 기존 next-mdx-remote는 요청마다 MDX를 컴파일하거나 별도의 캐싱 전략이 필요했다. (사실 캐싱은 생각도 안했다..)
 - Velite는 빌드 시점에 MDX를 컴파일하여 code 필드에 저장해두므로, 클라이언트는 가벼운 런타임 실행만 남게 되어 성능 개선이 가능해진다.
 
-## 📝 결론
+<span id="-결론" className="heading-alias" aria-hidden="true" />
+
+## 결론
 
 - Velite로의 마이그레이션은 단순한 라이브러리 교체가 아닌, 데이터 흐름의 최적화 과정
 

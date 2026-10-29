@@ -60,7 +60,7 @@ export default defineConfig({
       [
         rehypePrettyCode,
         {
-          theme: "one-dark-pro",
+          theme: { light: "github-light", dark: "github-dark-default" },
           keepBackground: false,
           defaultLang: { block: "javascript", inline: "text" },
         },

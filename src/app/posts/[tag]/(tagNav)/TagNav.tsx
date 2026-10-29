@@ -2,9 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useEffect } from "react";
-import { cn } from "@/lib/utils";
-import useHydrated from "@/hooks/useHydrated";
+import { useEffect, useRef } from "react";
 
 interface TagInfo {
   tag: string;
@@ -13,46 +11,32 @@ interface TagInfo {
 
 export function TagNav({ tagInfos, allTagCount }: { tagInfos: TagInfo[]; allTagCount: number }) {
   const pathname = usePathname();
-  const mounted = useHydrated();
-
+  const navRef = useRef<HTMLElement>(null);
   useEffect(() => {
-    const selectedLink = document.querySelector(`a[href='${pathname}']`);
-    selectedLink?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    const selected = navRef.current?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!selected || !navRef.current) return;
+    const nav = navRef.current;
+    const left = selected.offsetLeft;
+    if (left < nav.scrollLeft || left + selected.offsetWidth > nav.scrollLeft + nav.clientWidth)
+      nav.scrollLeft = left;
   }, [pathname]);
-
-  const getIsActive = (path: string) => {
-    if (!mounted) return false;
-    return pathname === path;
-  };
-
-  const navItemClass = cn(
-    "px-5 py-2 text-sm sm:text-base font-bold whitespace-nowrap rounded-full border transition-colors",
-    "bg-background text-muted-foreground border-border",
-    "hover:border-foreground hover:text-foreground", // 호버
-    "data-[active=true]:bg-foreground data-[active=true]:text-background data-[active=true]:border-foreground data-[active=true]:shadow-sm"
-  );
-
+  const tags = [
+    { tag: "전체", count: allTagCount, href: "/" },
+    ...tagInfos.map((item) => ({ ...item, href: `/posts/${item.tag}` })),
+  ];
   return (
-    <nav className="flex items-center justify-between w-full max-w-[1240px] mx-auto overflow-x-auto px-4 sm:px-6 py-3 mb-6 sm:py-6 no-scrollbar gap-2 sm:gap-3">
-      <div className="flex gap-3 sm:gap-4">
-        <Link className={navItemClass} href="/" data-active={getIsActive("/")}>
-          전체 <span className="ml-1 opacity-50 font-medium">{allTagCount}</span>
+    <nav ref={navRef} className="home-tags" aria-label="글 주제">
+      {tags.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className="home-tag"
+          aria-current={pathname === item.href ? "page" : undefined}
+        >
+          <span>{item.tag}</span>
+          <span className="home-tag-count">{item.count}</span>
         </Link>
-
-        {tagInfos.map((tagInfo) => {
-          const tagPath = `/posts/${tagInfo.tag}`;
-          return (
-            <Link
-              key={tagInfo.tag}
-              className={navItemClass}
-              href={tagPath}
-              data-active={getIsActive(tagPath)}
-            >
-              {tagInfo.tag} <span className="ml-1 opacity-50 font-medium">{tagInfo.count}</span>
-            </Link>
-          );
-        })}
-      </div>
+      ))}
     </nav>
   );
 }

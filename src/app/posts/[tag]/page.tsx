@@ -4,6 +4,7 @@ import { getMetaData } from "@/utils/getMetaData";
 import { getTagData } from "@/utils/tagUtil";
 import { getPostMetaData } from "@/utils/tagUtil";
 import MainHeader from "../_components/MainHeader";
+import getImagePath from "@/utils/getImagePath";
 
 // 방문 통계를 5분마다 다시 읽는다 (예전 fetch의 next.revalidate와 같은 주기).
 export const revalidate = 300;
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: Props) {
     title: decodedTag,
     description: `Post 목록 - ${decodedTag}`,
     asPath: `/posts/${tag}`,
-    ogImage: `/images/opgraph/op-image.png`,
+    ogImage: getImagePath(decodedTag, decodedTag, "", undefined, { variant: "collection" }),
   });
 }
 
@@ -41,7 +42,7 @@ async function PostsPage({ params }: Props) {
   const postMetaData: ReturnType<typeof getPostMetaData> = getPostMetaData();
 
   return (
-    <section className="flex flex-col w-full pb-20 pt-16 sm:pt-24">
+    <section className="home-page">
       <MainHeader />
       <TagNav tagInfos={tagInfos} allTagCount={allTagCount} />
       <Posts tag={decodedTag} posts={postMetaData} />

@@ -1,366 +1,141 @@
 ---
-title: SSE 연결이 끊긴 것과 실행이 끝난 것은 같은 사건일까?
-description: 스트림이 닫히면 run 도 끝났다고 믿던 채팅 런타임이 만든 버그와, 연결 상태와 실행 상태를 갈라놓으며 배운 것
+title: SSE 연결이 끊기면 실행도 끝난 걸까?
+description: 채팅 화면에 완료라고 떴는데 서버에서는 아직 실행 중이었다. 연결과 실행을 따로 관리하게 된 이유를 정리했다.
 tag: Portfolio
 createdDate: 2026-10-19 21:00:00
+updatedDate: 2026-10-29
 ---
 
 <TOC />
 
-# 스트림이 닫혔는데, 실행도 끝난 걸까?
+> 작업 시기: 2026.05 ~ 2026.10 · 마지막 정리: 2026.10.29
 
-> 작업 시기: 2026.05 ~ 2026.10 · 정리: 2026.10
+## 완료라고 뜨는데 서버는 아직 실행 중이었다
 
----
+에이전트 채팅 화면을 만들면서 연결이 끊겼는데 화면에는 완료로 표시되는 문제를 만났다.
 
-## 🔗 들어가며
+화면만 보면 답변이 다 끝난 것 같다. 그런데 서버에서는 아직 실행 중이고, 그 사이 다음 메시지를 보내면 이전 실행에 새 실행이 겹칠 수 있었다. 취소도 비슷했다. 취소 API의 응답을 받고 바로 다음 메시지를 보내면, 서버가 이전 실행을 멈추기 전에 새 실행이 시작될 수 있었다.
 
-### "완료됐다고 떴는데 답변이 계속 와요"
+연결이 끝난 것과 작업이 끝난 것을 같은 상태로 다루고 있었던 것이다. 이번 글에서는 이 둘을 나누면서 손본 부분을 정리해보려고 한다.
 
-- 에이전트 채팅 화면을 만들던 어느 날, 이런 보고가 들어왔다.
+실행 한 건은 `run`이라고 부르겠다. 아래 코드는 동작을 설명하기 위해 줄인 예시이고, 실제 SDK의 내부 API와는 다르다. 이벤트 처리 코드를 나눈 앞선 작업은 [Translator + Dispatcher 패턴](/posts/React/event-translator-dispatcher-pattern) 글에 정리해뒀다.
 
-  > 답변이 끝났다는 표시가 떴는데, 잠깐 뒤에 같은 말풍선에 글자가 더 붙어요. 그 사이에 제가 다음 메시지를 보내버렸고요.
+## 스트림을 다 읽었으니 실행도 끝났다?
 
-- 재현해 보니 범인은 단순했다. 와이파이가 잠깐 끊겼다 붙은 것뿐이었다.
-
-  그런데 화면은 그 순간을 **"응답 완료"** 로 그렸고, 사용자는 그 말을 믿고 다음 메시지를 보냈다. 서버 입장에서는 아직 끝나지 않은 run 위에 새 run 이 겹친 셈이다.
-
-- 이번 글은 "SSE 스트림이 닫히면 run 도 끝난 것" 이라고 믿던 런타임을, **연결 상태와 실행 상태를 따로 세는 구조**로 바꾸며 겪은 일을 정리한 기록이다. [Translator + Dispatcher 패턴](/posts/React/event-translator-dispatcher-pattern) 글에서 핸들러를 쪼갠 다음 단계의 이야기이기도 하다.
-
----
-
-## 🔗 처음의 구조 — 스트림 종료 = 실행 종료
-
-### reader 가 닫히면 status 를 completed 로
-
-- 초기 코드는 대략 이랬다. 세션 스트림을 읽다가 reader 가 끝나면 그걸로 run 을 마감했다.
+처음의 판단을 코드로 줄여보면 이런 모양이다.
 
 ```ts
-async function consume(response: Response) {
-  for await (const event of streamSseEvents(response)) {
-    dispatch(event);
-  }
-  // 스트림이 끝났다 → run 도 끝났다 (고 믿었다)
-  store.setRunStatus("completed");
-  store.commitPartialAsMessage();
+// 문제가 있던 판단을 단순화한 예시
+for await (const event of streamSseEvents(response)) {
+  dispatch(event);
 }
+
+// 반복문 종료만으로 실행 완료를 판단하고 있었다.
+finishRun("completed");
 ```
 
-- 서버가 `run.completed` 를 보내고 곱게 끝내는 경우에는 아무 문제가 없다. 문제는 **reader 가 닫히는 이유가 하나가 아니라는 것**이었다.
+반복문이 끝났으니 실행도 마감한다. 서버가 종결 이벤트를 보내고 연결을 닫았다면 문제없다. 그런데 네트워크 때문에 중간에 끊긴 경우라면?
 
-  - 서버가 종결 이벤트를 보내고 닫았다 → 진짜 끝
-  - 네트워크가 끊겼다 → 끝난 게 아니라 **못 듣고 있는 것**
-  - 사용자 입력을 기다리느라 서버가 잠시 조용하다 → 끝난 게 아니라 **멈춰 있는 것**
-  - 취소를 눌렀다 → 끝난 게 아니라 **끝내 달라고 부탁한 것**
+클라이언트가 더 이상 읽을 수 없게 됐을 뿐, 서버의 작업이 끝났는지는 아직 모른다. 이때도 완료로 옮겨버리니 화면과 서버의 상태가 달라졌다.
 
-- 넷 다 reader 가 닫히거나 조용해지는 모양은 비슷하다. 그런데 코드는 그 넷을 전부 `completed` 로 뭉갰다.
+여기에 이벤트가 오지 않는 상황까지 섞이면 더 헷갈린다. 사용자 입력을 기다리는 실행은 스트림이 열려 있어도 한동안 조용할 수 있다. 조용한 것과 연결이 닫힌 것도 따로 봐야 한다.
 
-### 취소 버튼은 또 왜
+### 연결과 실행을 따로 보자
 
-- 비슷한 버그가 취소 버튼에도 있었다. 취소 API 는 HTTP **202** 를 돌려준다. "접수했다" 는 뜻이지 "취소됐다" 는 뜻이 아니다.
+상태를 확인할 때 묻는 질문부터 나눴다.
 
-```ts
-async function cancel() {
-  await api.cancelRun(runId); // 202 Accepted
-  store.setRunStatus("idle"); // ← 여기서 바로 비웠다
-  flushQueuedMessage(); // ← 그리고 예약해 둔 다음 메시지를 바로 보냈다
-}
-```
+- **연결 상태:** 지금 서버의 이벤트를 받을 수 있는가?
+- **실행 상태:** 서버에서 작업이 진행 중인가, 입력을 기다리는가, 끝났는가?
 
-- 서버가 실제로 run 을 멈추기 전에 다음 메시지가 나갔다. 사용자가 보기엔 "취소했는데 둘 다 돌아가는" 상황이다.
+연결이 끊기면 연결 상태를 바꾸고 다시 붙는다. 이 일만으로 실행까지 완료로 바꾸지는 않는다. 실행 결과는 서버의 종결 이벤트나 재조회한 서버 상태로 확인한다.
 
-> 공통점이 보인다. **클라이언트가 실행의 종료를 자기 마음대로 선언**하고 있었다.
-> 연결이 끊긴 것도, 202 를 받은 것도, 서버 입장에서는 아직 아무것도 끝나지 않았다.
+<figure className="post-state-diagram" aria-label="연결 상태와 실행 상태를 따로 관리하는 구조">
+  <div className="post-state-row">
+    <span className="post-state-label">{"연결 상태"}</span>
+    <ol>
+      <li>{"연결됨"}</li>
+      <li>{"연결 끊김"}</li>
+      <li>{"재연결"}</li>
+    </ol>
+  </div>
+  <div className="post-state-row">
+    <span className="post-state-label">{"실행 상태"}</span>
+    <ol>
+      <li>{"진행 중"}</li>
+      <li>{"서버 상태 확인"}</li>
+      <li>{"진행 / 종료 판단"}</li>
+    </ol>
+  </div>
+  <figcaption>{"연결이 끊겼다는 이유만으로 실행을 완료 처리하지 않는다."}</figcaption>
+</figure>
 
----
+### 취소 요청도 접수와 완료가 다르다
 
-## 🔗 한 가지 통찰 — 연결은 내 사정, 실행은 서버 사정
+취소 API가 돌려주는 `202 Accepted`도 같은 관점에서 봤다. 요청을 받았다는 응답이지, 실행을 멈췄다는 응답은 아니다.
 
-### 두 상태를 따로 센다
-
-- 정리하고 보니 섞여 있던 건 두 종류의 상태였다.
-
-  - **연결 상태** — 지금 세션 스트림에 붙어 있는가. 끊겼으면 다시 붙으면 된다. 클라이언트 사정이다.
-  - **실행 상태** — 서버가 이 run 을 어디까지 진행했는가. `idle → connecting → streaming / tool_calling → completed | error`. 서버만 바꿀 수 있다.
-
-- 연결이 끊겨도 실행 상태는 **그대로 둔다**. 다시 붙어서 이어 들으면 된다.
-
-```ts
-type RunStatus =
-  | "idle"
-  | "connecting"
-  | "reasoning"
-  | "streaming"
-  | "tool_calling"
-  | "awaiting_input" // 사용자 입력 대기 — 종료 아님
-  | "stopping" // 취소 접수 — 종료 아님
-  | "completed"
-  | "error";
-
-type ConnectionState = "closed" | "opening" | "open" | "reconnecting";
-```
-
-- 그리고 **실행 상태의 종결은 서버의 terminal 이벤트에서만** 일어난다.
+그래서 이 응답만 받고 진행 중인 실행을 지우거나 다음 메시지를 보내지 않도록 했다. 종료가 확인된 뒤에는 완료·오류·취소를 구분한다. 취소를 요청하는 사이에 실행이 먼저 완료될 수도 있으니, `run.cancelled` 하나만 기다리는 것도 맞지 않는다.
 
 ```ts
-function onStreamClosed(reason: "eof" | "network" | "aborted") {
-  // 스트림이 닫힌 건 연결의 일이다. 실행 상태는 건드리지 않는다.
-  connection = "closed";
-  if (reason === "network" && isRunActive(run.status)) {
-    scheduleReconnect(); // partial 은 그대로 둔 채 resume
+// 종결 이벤트의 의미를 구분하는 설명용 예시
+function outcomeOf(type: "run.completed" | "run.error" | "run.cancelled") {
+  switch (type) {
+    case "run.completed":
+      return "completed";
+    case "run.error":
+      return "failed";
+    case "run.cancelled":
+      return "cancelled";
   }
 }
-
-function onTerminalEvent(event: RunCompleted | RunError | RunCancelled) {
-  if (run.terminalCommitted) return; // 한 번 종결한 run 은 다시 열리지 않는다
-  run.terminalCommitted = true;
-  commitPartialAsMessage();
-  run.status = event.type === "run.completed" ? "completed" : "error";
-}
 ```
 
-### 그럼 "진짜 끝" 은 어떻게 아나
+사용자 입력 대기도 종료가 아니다. 입력을 받기 전까지 실행의 맥락을 유지하고, 응답 제출이 접수되면 후속 이벤트를 이어서 받는다.
 
-- 종결은 세 이벤트뿐이다. `run.completed`, `run.error`, `run.cancelled`.
+## 연결이 끊긴 사이에 끝났으면 어떻게 알까?
 
-  이 셋 중 하나를 **관측했을 때만** 미커밋 partial 을 메시지로 확정하고 상태를 넘긴다. 그 외의 모든 조용함은 "아직 모름" 이다.
+여기서 한 가지가 더 남는다. 연결이 끊긴 동안 서버의 실행이 끝나버리면 클라이언트는 종결 이벤트를 못 받을 수도 있다. 이벤트를 직접 봐야만 끝낼 수 있게 만들면 이번에는 화면이 계속 진행 중으로 남는다.
 
-- 취소도 같은 규칙을 따른다. 202 를 받으면 `stopping` 으로만 바꾸고, 예약 전송은 **보류**한다. `run.cancelled` 가 도착해야 비로소 다음 메시지가 나간다.
+복구할 때 서버의 현재 상태를 다시 읽는 이유다. 진행 중인 실행이 있으면 그 스트림에 다시 붙고, 없으면 입력 잠금을 풀고 저장된 대화를 다시 가져온다. 끊긴 사이에 놓친 답변도 이때 채운다.
 
-```ts
-async function cancel() {
-  run.status = "stopping";
-  await api.cancelRun(runId); // 202 — 접수일 뿐이다
-  // 여기서 아무것도 비우지 않는다. run.cancelled 가 오면 onTerminalEvent 가 처리한다.
-}
-```
+다만 진행 중인 실행이 없다고 해서 성공했다는 뜻은 아니다. 입력할 수 있는 상태로 돌아오는 것과 완료 알림을 띄우는 것은 별개로 처리했다.
 
-- 사용자 입력 대기도 마찬가지다. 서버 상태가 `AWAITING_INTERACTION` 이면 스트림이 아무리 조용해도 종료가 아니다. 입력 카드는 그대로 두고, `respond()` 가 202 를 받으면 다시 세션 스트림에서 후속 이벤트를 듣는다.
+답변 저장 시점도 신경 써야 했다. 종결 이벤트는 왔는데 서버에 저장된 메시지는 아직 덜 채워져 있는 경우가 있었다. 이걸 그대로 화면에 덮으면 방금 보던 답변이 오히려 짧아진다. 로컬 본문과 서버의 확정 메시지를 구분하고, 재조회한 내용이 더 불완전할 때는 덮어쓰지 않도록 했다.
 
-<svg
-  viewBox="0 0 760 400"
-  role="img"
-  aria-label="실행 상태 전이도: 연결 유실·입력 대기·취소 접수는 종결이 아니며, 종결은 서버의 terminal 이벤트로만 일어난다"
-  className="mx-auto my-10 w-full max-w-[760px] text-foreground"
-  fontFamily="inherit"
-  fontSize="13"
->
-  <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
-    </marker>
-  </defs>
+테스트에는 이런 경우들을 넣었다.
 
-<g stroke="currentColor" strokeWidth="1.5" fill="none">
-  <rect x="20" y="60" width="110" height="44" rx="10" />
-  <rect x="190" y="60" width="130" height="44" rx="10" />
-  <rect x="380" y="60" width="150" height="44" rx="10" />
-  <rect
-    x="610"
-    y="60"
-    width="130"
-    height="44"
-    rx="10"
-    className="text-chart-1"
-    stroke="currentColor"
-    strokeWidth="2.5"
-  />
-</g>
-<g fill="currentColor" textAnchor="middle" fontWeight="600">
-  <text x="75" y="87">
-    {"idle"}
-  </text>
-  <text x="255" y="87">
-    {"connecting"}
-  </text>
-  <text x="455" y="87">
-    {"streaming · tool_calling"}
-  </text>
-  <text x="675" y="87">
-    {"completed · error"}
-  </text>
-</g>
-<g stroke="currentColor" strokeWidth="1.5" markerEnd="url(#arrow)">
-  <line x1="130" y1="82" x2="188" y2="82" />
-  <line x1="320" y1="82" x2="378" y2="82" />
-  <line x1="530" y1="82" x2="608" y2="82" />
-</g>
-<g fill="currentColor" fontSize="11" textAnchor="middle" opacity="0.8">
-  <text x="159" y="52">
-    {"sendMessage"}
-  </text>
-  <text x="349" y="52">
-    {"첫 이벤트"}
-  </text>
-  <text x="569" y="52">
-    {"run.completed / run.error"}
-  </text>
-</g>
+- 실행은 수락됐는데 첫 스트림 연결이 실패한 경우
+- 연결이 끊긴 사이 실행이 끝나고 답변이 저장된 경우
+- 종결 이벤트와 확정 메시지의 도착 시점이 다른 경우
+- 취소를 요청했지만 종료 여부는 아직 확인하지 못한 경우
 
-<g stroke="currentColor" strokeWidth="1.5" fill="none" strokeDasharray="5 4">
-  <rect x="60" y="200" width="170" height="54" rx="10" />
-  <rect x="295" y="200" width="170" height="54" rx="10" />
-  <rect x="530" y="200" width="190" height="54" rx="10" />
-</g>
-<g fill="currentColor" textAnchor="middle" fontWeight="600">
-  <text x="145" y="223">
-    {"연결 유실"}
-  </text>
-  <text x="380" y="223">
-    {"awaiting_input (HIL)"}
-  </text>
-  <text x="625" y="223">
-    {"stopping (취소 202 접수)"}
-  </text>
-</g>
-<g fill="currentColor" textAnchor="middle" fontSize="11" opacity="0.8">
-  <text x="145" y="243">
-    {"실행 상태 유지 · resume 재연결"}
-  </text>
-  <text x="380" y="243">
-    {"스트림이 조용해도 종료 아님"}
-  </text>
-  <text x="625" y="243">
-    {"run.cancelled 전까지 전송 보류"}
-  </text>
-</g>
+## 본문이 바뀔 때 다른 화면까지 다시 그려야 할까?
 
-<g stroke="currentColor" strokeWidth="1.5" fill="none" markerEnd="url(#arrow)">
-  <path d="M 420 104 C 300 140, 200 150, 150 198" />
-  <path d="M 170 200 C 230 150, 330 135, 440 106" strokeDasharray="5 4" />
-  <path d="M 455 104 L 400 198" />
-  <path d="M 410 200 L 470 106" strokeDasharray="5 4" />
-  <path d="M 490 104 C 560 140, 600 160, 615 198" />
-  <path d="M 650 198 C 670 160, 680 130, 680 106" strokeDasharray="5 4" />
-</g>
-<g fill="currentColor" fontSize="11" opacity="0.8">
-  <text x="236" y="150">
-    {"끊김"}
-  </text>
-  <text x="262" y="124">
-    {"재개(partial 보존)"}
-  </text>
-  <text x="352" y="165">
-    {"interaction"}
-  </text>
-  <text x="478" y="128">
-    {"respond 202"}
-  </text>
-  <text x="546" y="150">
-    {"cancel 202"}
-  </text>
-  <text x="686" y="150">
-    {"run.cancelled"}
-  </text>
-</g>
-
-  <g fill="currentColor" fontSize="12">
-    <text x="20" y="320" fontWeight="700">{'규칙'}</text>
-    <text x="20" y="342">{'① 점선 상태는 종결이 아니다. 실행 상태는 유지되고 연결만 복구한다.'}</text>
-    <text x="20" y="362">{'② 종결(실선 강조 상자)은 서버의 terminal 이벤트를 관측했을 때만 커밋한다. 한 번 종결한 run은 다시 열리지 않는다.'}</text>
-    <text x="20" y="382">{'③ 202는 접수다. 취소·응답 모두 후속 이벤트는 세션 스트림에서만 받는다.'}</text>
-  </g>
-</svg>
-
----
-
-## 🔗 서버도 완벽하지 않다 — 믿지 않고 복구하기
-
-### terminal 만 오고 commit 이 안 온다
-
-- 상태를 갈라놓고 나니 이번엔 서버 쪽의 비정상 형태들이 눈에 들어왔다. 실측에서 두 가지가 반복됐다.
-
-  - `run.completed` 는 왔는데 그 뒤에 와야 할 메시지 확정 이벤트가 **안 온다**. 새로고침 전까지 말풍선이 빈 채로 남는다.
-  - 세션 상태 조회에 어떤 run 이 `RUNNING` 으로 **수십 분째 굳어** 있다. 그대로 믿으면 사용자는 영원히 "진행 중" 화면을 본다.
-
-- 둘 다 "서버가 보낸 걸 그대로 믿으면" 생기는 문제라, 런타임이 **의심하는 지점**을 두 군데 뒀다.
-
-```ts
-// (1) terminal 을 관측했는데 canonical 메시지가 비어 있으면 한 번 다시 가져온다
-async function afterTerminal(runId: string) {
-  if (!store.hasCanonicalMessage(runId)) {
-    await refetchMessages({ reason: "terminal-without-commit" });
-  }
-}
-
-// (2) 오래 굳은 active run 은 믿지 않는다
-function pickActiveRun(state: SessionState) {
-  const run = state.activeRun;
-  if (!run) return null;
-  if (isStale(run.updatedAt)) return null; // 복구 경로로 보낸다
-  return run;
-}
-```
-
-### 테스트는 "서버가 이상하게 굴 때" 를 적는다
-
-- 이 두 경우는 그대로 vitest 케이스가 됐다. 정상 흐름보다 **비정상 형태를 재현하는 테스트**가 더 많아졌는데, 이 런타임의 가치가 거기 있다고 생각한다.
-
-> 런타임이 서버를 의심하지 않으면, 서버의 레이스가 그대로 사용자의 화면이 된다.
-
----
-
-## 🔗 구조 — 누가 무엇을 모르게 할 것인가
-
-### ⬇️ 세 계층
-
-- 분리하고 나니 SDK 가 자연스럽게 세 겹이 됐다.
+SDK를 정리하면서 통신, 대화 상태 관리, React 연동의 책임도 나눴다. 통신 쪽에서는 HTTP·인증·SSE 프레임을 다루고, 대화 런타임에서 실행과 복구를 판단한다. React에서는 화면에 필요한 상태를 구독한다.
 
 ```text
-/streaming        HTTP · 인증 재시도 · SSE 프레임 reader
-                  → 이벤트 이름도, 도메인도, React 도 모른다
-       │
-controller        run 시작 · 구독 · HIL · 히스토리 · 재연결 복구
-                  → 상태는 자체 vanilla store 가 소유. React 없이도 돈다
-       │
-/react            useChatSessionSelector(controller, s => s.messages)
-                  → 스냅샷의 좁은 조각만 구독한다
+통신 처리        HTTP · 인증 · SSE 프레임
+     ↓
+대화 런타임      실행 · 입력 대기 · 취소 · 기록 재조회
+     ↓
+React 연동       화면에서 필요한 상태만 구독
 ```
 
-- 연결은 코어가, 실행 상태는 controller 가, 리렌더 범위는 selector 가 책임진다. 한 층의 변경이 다른 층으로 번지지 않는다.
+여기서 실시간 본문과 저장된 메시지 목록은 바뀌는 빈도가 다르다. 본문은 초당 수십 번 바뀌는데, 메시지 목록은 그렇게 자주 바뀌지 않는다. 둘을 같이 구독하면 본문에 글자가 붙을 때마다 관계없는 화면까지 다시 그려진다.
 
-### 왜 전체 snapshot 을 구독하는 훅은 안 만들었나
-
-- `text.delta` 는 초당 수십 번 온다. 메시지 목록은 run 당 몇 번 바뀐다. 둘을 같은 구독으로 묶으면 느린 쪽이 빠른 쪽에 끌려다닌다.
+그래서 본문을 그리는 컴포넌트에서 그 상태만 따로 구독하게 했다.
 
 ```tsx
-// 저빈도 컴포넌트 — streamingText 가 바뀌어도 깨어나지 않는다
-const messages = useChatSessionSelector(controller, (s) => s.messages);
+// 메시지 목록을 표시하는 컴포넌트
+const messages = useChatSessionSelector(controller, (state) => state.messages);
 
-// 고빈도 컴포넌트 — 리프에서 따로 구독한다
-const streamingText = useChatSessionSelector(controller, (s) => s.streamingText);
+// 실시간 본문을 표시하는 컴포넌트
+const streamingText = useChatSessionSelector(controller, (state) => state.streamingText);
 ```
 
-- 그래서 전체 스냅샷 훅은 **일부러** 두지 않았다. 소비자가 selector 로 조각을 좁히는 게 기본값이어야 delta storm 에서 상위 트리가 조용하다.
+패키지 출력도 모듈 단위로 바꿨다. 작은 상태 판별 함수 하나를 가져오는데 제품 스키마까지 따라오던 비용을 줄이기 위해서다. 여기서 줄어든 것은 해당 기능만 가져오는 소비 경로의 크기이고, 제품 앱 전체 번들이 같은 비율로 줄어든 것은 아니다.
 
-### 덤 — 하나만 import 했는데 전부 따라온다
+## 정리하면서 남은 것
 
-- 세 계층으로 나눈 김에 패키지 출력도 손봤다. 한 파일로 묶인 dist 에서는 모듈 최상위의 스키마 생성 호출이 tree-shaking 되지 않아, 상태 판별 함수 하나만 가져와도 **수 KB** 가 딸려 왔다.
+상태를 나눴으니 확인해야 할 경우의 수도 늘었다. 대신 연결 실패인지, 입력 대기인지, 취소가 접수된 것인지 따로 재현해서 볼 수 있게 됐다. 완료로 보낼 근거가 없는 상태를 억지로 완료에 넣지 않아도 된다.
 
-  모듈 단위 출력으로 바꾸고 스키마 없는 관측 모듈을 분리하니 **수백 B** 로 내려갔다. 다만 이건 최소 소비 번들 기준이고, 앱 전체 번들은 전후가 같다. 숫자를 크게 말하고 싶은 유혹이 있지만 범위를 같이 적는 게 맞다.
-
----
-
-## 🔗 남는 교훈
-
-### 종료를 선언할 권리는 서버에만 있다
-
-- 연결은 클라이언트 사정으로도 끊긴다. 실행은 서버만 끝낼 수 있다.
-
-  클라이언트가 실행을 끝났다고 선언하는 순간, 서버와 화면의 상태가 갈라진다. 그 틈에서 "완료됐는데 글자가 더 붙는" 버그가 자란다.
-
-- 그래서 지금 런타임의 규칙은 한 줄이다.
-
-> 조용한 건 "아직 모름" 이고, 끝은 terminal 이벤트를 **본 다음** 이다.
-
-### 비슷한 스트림 화면을 만들고 있다면
-
-- SSE 나 WebSocket 으로 긴 작업을 그리는 화면이라면, 다음 질문을 던져보면 좋겠다.
-
-  - reader 가 닫혔을 때, 그 이유가 **몇 가지**인지 코드가 구분하는가?
-  - 취소 · 응답 API 의 2xx 를 **완료**로 읽고 있지는 않은가?
-  - 서버가 종결 이벤트만 보내고 후속을 안 보내면, 화면은 어떻게 되는가?
-
-- 셋 중 하나라도 답이 애매하다면, 연결 상태와 실행 상태를 **다른 변수**로 떼어 놓는 것부터 해보자. 그것만으로 "믿으면 안 되는 지점" 이 코드에 드러난다.
-
-  이 작업 뒤로 2xx 응답을 보면 "그래서 이게 끝났다는 거야, 받았다는 거야?" 부터 묻는 버릇이 생겼다. 202 는 특히.
+장시간 연결이나 강제 연결 절단을 포함한 시나리오, 브라우저 CPU·메모리 사용량은 아직 별도로 검증해야 한다. 상태 전이 테스트가 통과했다고 장시간 사용까지 확인한 셈으로 적어두지는 않으려고 한다.

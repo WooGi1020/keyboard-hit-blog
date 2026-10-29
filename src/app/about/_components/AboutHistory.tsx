@@ -2,32 +2,19 @@ import ABOUT_ME from "@/constant/ABOUT_ME";
 
 function AboutHistory() {
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center gap-3">
-        <span className="text-xs font-bold uppercase tracking-widest text-chart-1 opacity-80">
-          Education · Certificates · Activities
-        </span>
-        <div className="h-px flex-1 bg-chart-1/10" />
+    <section className="about-section" aria-labelledby="about-history-title">
+      <div className="about-section-heading">
+        <h2 id="about-history-title">학력·자격·활동</h2>
       </div>
-      <div className="flex flex-col gap-0 border-l-2 border-input ml-3 cursor-default">
-        {ABOUT_ME.history.map((history) => (
-          <div key={history.do} className="relative pl-8 pb-8 last:pb-0">
-            {/* Timeline Dot */}
-            <div className="absolute left-[-7px] top-2 size-3 rounded-full border-2 border-chart-1 bg-background z-10" />
-
-            <div className="flex flex-col gap-1 group">
-              <span className="text-base md:text-lg font-bold group-hover:text-chart-1 transition-colors break-keep">
-                {history.do}
-              </span>
-              <span className="text-sm font-medium text-muted-foreground bg-accent w-fit px-2 py-0.5 rounded-md">
-                {history.period}
-              </span>
-            </div>
-          </div>
+      <ol className="about-history">
+        {ABOUT_ME.history.map((item) => (
+          <li key={item.do}>
+            <h3>{item.do}</h3>
+            <p>{item.period}</p>
+          </li>
         ))}
-      </div>
-    </div>
+      </ol>
+    </section>
   );
 }
-
 export default AboutHistory;
