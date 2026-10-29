@@ -7,13 +7,15 @@ createdDate: 2026-10-19 21:00:00
 
 <TOC />
 
-# 🔌 스트림이 닫혔는데, 실행도 끝난 걸까?
+# 스트림이 닫혔는데, 실행도 끝난 걸까?
+
+> 작업 시기: 2026.05 ~ 2026.10 · 정리: 2026.10
 
 ---
 
 ## 🔗 들어가며
 
-### ✨ "완료됐다고 떴는데 답변이 계속 와요"
+### "완료됐다고 떴는데 답변이 계속 와요"
 
 - 에이전트 채팅 화면을 만들던 어느 날, 이런 보고가 들어왔다.
 
@@ -29,7 +31,7 @@ createdDate: 2026-10-19 21:00:00
 
 ## 🔗 처음의 구조 — 스트림 종료 = 실행 종료
 
-### 🚫 reader 가 닫히면 status 를 completed 로
+### reader 가 닫히면 status 를 completed 로
 
 - 초기 코드는 대략 이랬다. 세션 스트림을 읽다가 reader 가 끝나면 그걸로 run 을 마감했다.
 
@@ -53,7 +55,7 @@ async function consume(response: Response) {
 
 - 넷 다 reader 가 닫히거나 조용해지는 모양은 비슷하다. 그런데 코드는 그 넷을 전부 `completed` 로 뭉갰다.
 
-### 🤔 취소 버튼은 또 왜
+### 취소 버튼은 또 왜
 
 - 비슷한 버그가 취소 버튼에도 있었다. 취소 API 는 HTTP **202** 를 돌려준다. "접수했다" 는 뜻이지 "취소됐다" 는 뜻이 아니다.
 
@@ -74,7 +76,7 @@ async function cancel() {
 
 ## 🔗 한 가지 통찰 — 연결은 내 사정, 실행은 서버 사정
 
-### 💡 두 상태를 따로 센다
+### 두 상태를 따로 센다
 
 - 정리하고 보니 섞여 있던 건 두 종류의 상태였다.
 
@@ -117,7 +119,7 @@ function onTerminalEvent(event: RunCompleted | RunError | RunCancelled) {
 }
 ```
 
-### 🤔 그럼 "진짜 끝" 은 어떻게 아나
+### 그럼 "진짜 끝" 은 어떻게 아나
 
 - 종결은 세 이벤트뿐이다. `run.completed`, `run.error`, `run.cancelled`.
 
@@ -264,7 +266,7 @@ async function cancel() {
 
 ## 🔗 서버도 완벽하지 않다 — 믿지 않고 복구하기
 
-### 🚫 terminal 만 오고 commit 이 안 온다
+### terminal 만 오고 commit 이 안 온다
 
 - 상태를 갈라놓고 나니 이번엔 서버 쪽의 비정상 형태들이 눈에 들어왔다. 실측에서 두 가지가 반복됐다.
 
@@ -290,7 +292,7 @@ function pickActiveRun(state: SessionState) {
 }
 ```
 
-### 💡 테스트는 "서버가 이상하게 굴 때" 를 적는다
+### 테스트는 "서버가 이상하게 굴 때" 를 적는다
 
 - 이 두 경우는 그대로 vitest 케이스가 됐다. 정상 흐름보다 **비정상 형태를 재현하는 테스트**가 더 많아졌는데, 이 런타임의 가치가 거기 있다고 생각한다.
 
@@ -317,7 +319,7 @@ controller        run 시작 · 구독 · HIL · 히스토리 · 재연결 복�
 
 - 연결은 코어가, 실행 상태는 controller 가, 리렌더 범위는 selector 가 책임진다. 한 층의 변경이 다른 층으로 번지지 않는다.
 
-### 🤔 왜 전체 snapshot 을 구독하는 훅은 안 만들었나
+### 왜 전체 snapshot 을 구독하는 훅은 안 만들었나
 
 - `text.delta` 는 초당 수십 번 온다. 메시지 목록은 run 당 몇 번 바뀐다. 둘을 같은 구독으로 묶으면 느린 쪽이 빠른 쪽에 끌려다닌다.
 
@@ -331,7 +333,7 @@ const streamingText = useChatSessionSelector(controller, (s) => s.streamingText)
 
 - 그래서 전체 스냅샷 훅은 **일부러** 두지 않았다. 소비자가 selector 로 조각을 좁히는 게 기본값이어야 delta storm 에서 상위 트리가 조용하다.
 
-### 📦 덤 — 하나만 import 했는데 전부 따라온다
+### 덤 — 하나만 import 했는데 전부 따라온다
 
 - 세 계층으로 나눈 김에 패키지 출력도 손봤다. 한 파일로 묶인 dist 에서는 모듈 최상위의 스키마 생성 호출이 tree-shaking 되지 않아, 상태 판별 함수 하나만 가져와도 **수 KB** 가 딸려 왔다.
 
@@ -341,7 +343,7 @@ const streamingText = useChatSessionSelector(controller, (s) => s.streamingText)
 
 ## 🔗 남는 교훈
 
-### 💡 종료를 선언할 권리는 서버에만 있다
+### 종료를 선언할 권리는 서버에만 있다
 
 - 연결은 클라이언트 사정으로도 끊긴다. 실행은 서버만 끝낼 수 있다.
 
@@ -351,7 +353,7 @@ const streamingText = useChatSessionSelector(controller, (s) => s.streamingText)
 
 > 조용한 건 "아직 모름" 이고, 끝은 terminal 이벤트를 **본 다음** 이다.
 
-### 🤔 비슷한 스트림 화면을 만들고 있다면
+### 비슷한 스트림 화면을 만들고 있다면
 
 - SSE 나 WebSocket 으로 긴 작업을 그리는 화면이라면, 다음 질문을 던져보면 좋겠다.
 
@@ -361,4 +363,4 @@ const streamingText = useChatSessionSelector(controller, (s) => s.streamingText)
 
 - 셋 중 하나라도 답이 애매하다면, 연결 상태와 실행 상태를 **다른 변수**로 떼어 놓는 것부터 해보자. 그것만으로 "믿으면 안 되는 지점" 이 코드에 드러난다.
 
-  😁 이 작업 뒤로 2xx 응답을 보면 "그래서 이게 끝났다는 거야, 받았다는 거야?" 부터 묻는 버릇이 생겼다. 202 는 특히.
+  이 작업 뒤로 2xx 응답을 보면 "그래서 이게 끝났다는 거야, 받았다는 거야?" 부터 묻는 버릇이 생겼다. 202 는 특히.
