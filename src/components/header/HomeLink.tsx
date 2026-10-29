@@ -19,11 +19,13 @@ export default function HomeLink({ pathname }: { pathname: string }) {
   return (
     <Link
       href="/"
-      title="메인 페이지 링크"
+      title="홈으로"
+      aria-label="홈으로"
+      aria-current={active ? "page" : undefined}
       data-active={active}
       className="group relative flex items-center justify-center w-28 h-10 transition-transform duration-300"
     >
-      <div className="absolute inset-x-1 h-10 bg-accent-foreground/20 dark:bg-muted/80 rounded-lg border-2 border-border/40" />
+      <div className="site-keyboard-keycap absolute inset-x-1 h-10 rounded-lg border-2" />
 
       <div className="absolute inset-x-1 inset-y-0 pointer-events-none overflow-hidden rounded-lg">
         <span

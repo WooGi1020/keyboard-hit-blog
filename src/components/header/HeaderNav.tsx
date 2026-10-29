@@ -7,18 +7,14 @@ import AboutMeLink from "./AboutMeLink";
 
 function HeaderNav() {
   const pathname = usePathname();
-
   return (
-    <nav className="flex justify-between items-center h-full w-full max-w-[1232px] px-4 mx-auto">
-      <div className="flex gap-3 items-center">
+    <nav className="site-header-nav" aria-label="주 메뉴">
+      <div className="site-header-links">
         <HomeLink pathname={pathname} />
         <AboutMeLink pathname={pathname} />
       </div>
-      <div className="flex items-center gap-3">
-        <LazyThemeChangeButton />
-      </div>
+      <LazyThemeChangeButton />
     </nav>
   );
 }
-
 export default HeaderNav;

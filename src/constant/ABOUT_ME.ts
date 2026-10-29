@@ -44,7 +44,7 @@ const ABOUT_ME = {
           summary:
             "에이전트의 답변이 실시간으로 흘러오는 대화 화면과, 그 통신을 맡는 클라이언트 SDK를 만들었습니다. 화면 안의 훅 하나로 시작한 SDK를 별도 패키지로 독립시키고 계층을 나눠, 서버가 바뀌어도 화면이 흔들리지 않게 했습니다. 설치된 패키지 기준으로 검증을 자동화하고, 번들 크기를 예산으로 관리합니다.",
           caseHref: "/posts/Portfolio/chat-runtime-connection-vs-run",
-          caseTitle: "SSE 연결이 끊긴 것과 실행이 끝난 것은 같은 사건일까?",
+          caseTitle: "SSE 연결이 끊기면 실행도 끝난 걸까?",
         },
         {
           name: "Smoody Scouter",
@@ -54,7 +54,7 @@ const ABOUT_ME = {
           summary:
             "에이전트가 만든 초안을 사람이 검토하고 승인한 뒤에만 발송되는 업무 흐름을 화면부터 서버, 데이터 저장까지 만들었습니다. Gmail·YouTube·Meta 같은 외부 서비스 연동과 보안 검토, 배포와 운영 스케줄러까지 프론트와 백엔드를 한 흐름으로 맡았습니다.",
           caseHref: "/posts/Portfolio/human-approval-and-agent-writes",
-          caseTitle: "승인 버튼을 눌렀을 때, 발송되는 건 정말 내가 본 그 초안일까?",
+          caseTitle: "내가 승인한 초안이 그대로 발송되려면",
         },
         {
           name: "Smoody Design System",
@@ -64,7 +64,7 @@ const ABOUT_ME = {
           summary:
             "색상과 간격 같은 디자인 기준을 한 곳에서 관리하고 코드로 배포하는 체계를 만들었습니다. 제품마다 요구가 달라지자, 모두가 공유할 것과 각 제품이 직접 가질 것의 경계를 다시 정해 운영 부담을 줄였습니다.",
           caseHref: "/posts/Portfolio/design-system-product-owned-ui",
-          caseTitle: "공통 컴포넌트를 왜 다시 제품으로 돌려보냈을까?",
+          caseTitle: "공통 UI를 제품 코드로 옮긴 이유",
         },
       ],
     },

@@ -7,12 +7,16 @@ createdDate: 2025-12-06 17:17:51
 
 <TOC />
 
-# ✨ 들어가며
+<span id="-들어가며" className="heading-alias" aria-hidden="true" />
+
+# 들어가며
 
 - 자주 즐겨보는 유튜브인 [코딩애플](https://www.youtube.com/@codingapple)에서 오랜만에(?) 코딩 채널다운 영상을 올려주셨다.
 - `Proxy` 객체로 구현하는 반응성 프로그래밍에 대한 내용이었는데, 흥미가 생겨서 직접 활용해보고 공부한 것들을 정리해보려고 한다.
 
-## 🕵️‍♂️ Proxy 객체란?
+<span id="️️-proxy-객체란" className="heading-alias" aria-hidden="true" />
+
+## Proxy 객체란?
 
 - `Proxy` 객체는 ES6에서 도입된 기능으로, 다른 객체에 대한 접근을 가로채 사이드 이펙트를 추가하거나 감시하는 역할을 수행한다.
 
@@ -40,7 +44,9 @@ const handler = {
 const proxy = new Proxy(target, handler);
 ```
 
-## 💻 Proxy 맛보기
+<span id="-proxy-맛보기" className="heading-alias" aria-hidden="true" />
+
+## Proxy 맛보기
 
 - 위에서 말했듯이 `Proxy` 객체는 다양한 활용이 가능하다. 몇 가지 예시를 통해 살펴보자
 
@@ -94,7 +100,9 @@ const proxy = new Proxy(target, handler);
 
 > 이런 방식은 더 다양한 로직에 활용이 가능하다.
 
-## 💻 Proxy 활용하기
+<span id="-proxy-활용하기" className="heading-alias" aria-hidden="true" />
+
+## Proxy 활용하기
 
 - 살펴본 활용법을 바탕으로, 간단한 **양방향 바인딩** 예제를 구현해보자.
 - 아래 예제는 HTML input 요소와 Proxy 객체를 활용해, 사용자가 입력한 값이 실시간으로 화면에 반영되는 기능을 제공한다.
@@ -138,7 +146,9 @@ const proxy = new Proxy(target, handler);
 
 오랜만에 html 문법 사용하니 상당히 어색하다.. 😂
 
-### 💻 Proxy로 심플한 리액트 구현하기
+<span id="-proxy로-심플한-리액트-구현하기" className="heading-alias" aria-hidden="true" />
+
+### Proxy로 심플한 리액트 구현하기
 
 - 지금까지의 맛보기와 활용하기 예제를 바탕으로, 리렌더링 베이스의 기본 동작원리를 가지고 있는 구현체를 만들어보았다.
 - 리액트와 같이 렌더링을 위한 `root` 노드를 만든다.
@@ -204,7 +214,9 @@ if (appRoot) {
 
 ![Proxy기반 심플 리액트 카운터](/images/post/proxy-counter.webp)
 
-## 📝 결론
+<span id="-결론" className="heading-alias" aria-hidden="true" />
+
+## 결론
 
 ```find
 Proxy 객체는 자바스크립트에서 객체의 동작을 세밀하게 제어할 수 있는 강력한 도구이다.

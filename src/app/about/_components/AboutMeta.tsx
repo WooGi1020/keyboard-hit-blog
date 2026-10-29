@@ -1,56 +1,36 @@
 import ABOUT_ME from "@/constant/ABOUT_ME";
-import { MapIcon, Mail } from "lucide-react";
+import { MapPin, Mail } from "lucide-react";
 import GithubIcon from "@/components/icons/GithubIcon";
-import Link from "next/link";
 import FlippableAvatar from "./FlippableAvatar";
 
 function AboutMeta() {
   return (
-    <>
-      <div className="flex justify-between w-full items-start">
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-5xl font-semibold max-sm:text-[36px] tracking-tight">
-              {ABOUT_ME.name}
-            </h1>
-            <p className="text-xl font-semibold text-muted-foreground max-sm:text-lg italic">
-              {ABOUT_ME.role}
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-2 items-center text-muted-foreground">
-              <MapIcon className="size-5 max-sm:size-4" />
-              <p className="text-base font-medium max-sm:text-[14px]">{ABOUT_ME.address}</p>
-            </div>
-
-            <div className="flex flex-wrap gap-4 mt-2">
-              <Link
-                href={`mailto:${ABOUT_ME.email}`}
-                className="flex items-center gap-1.5 hover:text-chart-1 transition-colors"
-              >
-                <Mail className="size-5" />
-                <span className="text-sm font-medium">E-mail</span>
-              </Link>
-              <Link
-                href={ABOUT_ME.github}
-                target="_blank"
-                className="flex items-center gap-1.5 hover:text-chart-1 transition-colors"
-              >
-                <GithubIcon className="size-5" />
-                <span className="text-sm font-medium">GitHub</span>
-              </Link>
-            </div>
-          </div>
+    <header className="about-profile">
+      <div className="about-profile-copy">
+        <span className="about-eyebrow">About Me</span>
+        <h1>{ABOUT_ME.name}</h1>
+        <p className="about-role">{ABOUT_ME.role}</p>
+        <p className="about-location">
+          <MapPin size={15} aria-hidden="true" />
+          {ABOUT_ME.address}
+        </p>
+        <div className="about-contact">
+          <a href={`mailto:${ABOUT_ME.email}`}>
+            <Mail size={16} aria-hidden="true" />
+            <span>E-mail</span>
+          </a>
+          <a href={ABOUT_ME.github} target="_blank" rel="noopener noreferrer">
+            <GithubIcon className="size-4" />
+            <span>GitHub</span>
+          </a>
         </div>
-        <FlippableAvatar
-          frontSrc={ABOUT_ME.avatar}
-          backSrc={ABOUT_ME.avatarBack}
-          fallback={ABOUT_ME.name}
-        />
       </div>
-    </>
+      <FlippableAvatar
+        frontSrc={ABOUT_ME.avatar}
+        backSrc={ABOUT_ME.avatarBack}
+        fallback={ABOUT_ME.name}
+      />
+    </header>
   );
 }
-
 export default AboutMeta;

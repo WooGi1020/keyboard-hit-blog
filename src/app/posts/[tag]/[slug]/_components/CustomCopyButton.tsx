@@ -62,7 +62,7 @@ export default function CustomCopyButton({ codeChildren }: CopyButtonProps) {
       size="icon"
       onClick={handleCopy}
       ref={buttonRef}
-      className="size-6 text-zinc-400 hover:bg-white/10 hover:text-zinc-100 transition-colors"
+      className="post-code-copy"
       aria-label="코드 복사"
     >
       {isCopied ? <Check className="size-3.5 text-green-400" /> : <Copy className="size-3.5" />}

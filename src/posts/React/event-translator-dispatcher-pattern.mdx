@@ -1,19 +1,34 @@
 ---
-title: 이벤트와 상태의 분리 — Translator + Dispatcher 패턴
+title: SSE 이벤트와 상태 분리하기
 description: SSE 핸들러가 스토어를 직접 mutate 하면서 생긴 lifecycle 결함을, wire 어휘와 도메인 어휘를 분리해 해결한 리팩터링 회고
 tag: React
 createdDate: 2026-06-02 21:30:00
+updatedDate: 2026-10-29
 ---
 
 <TOC />
 
-# 🧩 이벤트와 상태, 한 함수 안에 같이 있어도 괜찮을까?
+<span
+  id="-이벤트와-상태-한-함수-안에-같이-있어도-괜찮을까"
+  className="heading-alias"
+  aria-hidden="true"
+/>
+
+# 이벤트와 상태, 한 함수 안에 같이 있어도 괜찮을까?
 
 ---
 
-## 🔗 들어가며
+<span id="-들어가며" className="heading-alias" aria-hidden="true" />
 
-### ✨ 핸들러 한 줄을 고치려는데 reset 정책까지 봐야 했다
+## 들어가며
+
+<span
+  id="-핸들러-한-줄을-고치려는데-reset-정책까지-봐야-했다"
+  className="heading-alias"
+  aria-hidden="true"
+/>
+
+### 핸들러 한 줄을 고치려는데 reset 정책까지 봐야 했다
 
 - 최근 SSE 기반의 실시간 채팅 화면 코드를 한참 들여다보고 있었다.
 
@@ -27,9 +42,17 @@ createdDate: 2026-06-02 21:30:00
 
 ---
 
-## 🔗 처음의 구조 — 핸들러 하나가 너무 많은 일을 한다
+<span
+  id="-처음의-구조--핸들러-하나가-너무-많은-일을-한다"
+  className="heading-alias"
+  aria-hidden="true"
+/>
 
-### 🚫 비대해진 핸들러 파일
+## 처음의 구조 — 핸들러 하나가 너무 많은 일을 한다
+
+<span id="-비대해진-핸들러-파일" className="heading-alias" aria-hidden="true" />
+
+### 비대해진 핸들러 파일
 
 - 리팩터링 이전의 핸들러 파일은 한 1800줄쯤 됐다. 대략 이런 모양이었다.
 
@@ -61,7 +84,9 @@ const handlers = {
   - **lifecycle 가드** — owner 가 일치하는지, mount 직후인지
   - **side-effect** — placeholder 추가 같은 외부 작용
 
-### 🤔 그러면 한 함수가 많은 일을 하면 안 되나?
+<span id="-그러면-한-함수가-많은-일을-하면-안-되나" className="heading-alias" aria-hidden="true" />
+
+### 그러면 한 함수가 많은 일을 하면 안 되나?
 
 - 안 된다기보다, **변경이 들어오는 축이 너무 많아진다**는 게 진짜 문제였다.
 
@@ -86,9 +111,13 @@ const handlers = {
 
 ---
 
-## 🔗 한 가지 통찰 — 이벤트는 그냥 IO 다
+<span id="-한-가지-통찰--이벤트는-그냥-io-다" className="heading-alias" aria-hidden="true" />
 
-### 💡 wire 어휘 vs 도메인 어휘
+## 한 가지 통찰 — 이벤트는 그냥 IO 다
+
+<span id="-wire-어휘-vs-도메인-어휘" className="heading-alias" aria-hidden="true" />
+
+### wire 어휘 vs 도메인 어휘
 
 - 이번 리팩터의 출발점이 된 한 문장이 있다.
 
@@ -99,7 +128,9 @@ const handlers = {
   - **Wire 어휘** — `run.started`, `text.delta`, `tool_use.confirmation`, … 이건 백엔드의 결정이다. 프론트가 통제할 수 없다.
   - **도메인 어휘** — `RunBegan`, `AssistantTextChunk`, `ToolConfirmationOpened`, … 이건 프론트의 결정이다. 사용자에게 어떤 의미인지를 표현한다.
 
-### 🤔 굳이 이걸 둘로 나눠야 하나?
+<span id="-굳이-이걸-둘로-나눠야-하나" className="heading-alias" aria-hidden="true" />
+
+### 굳이 이걸 둘로 나눠야 하나?
 
 - 같은 의미 (예: "run 이 시작됨") 가 wire 단에서 `run.started` 와 `run.snapshot` 두 곳에 분산되어 있다고 해보자.
 
@@ -113,26 +144,44 @@ const handlers = {
 
 ---
 
-## 🔗 네 가지 원칙
+<span id="-네-가지-원칙" className="heading-alias" aria-hidden="true" />
 
-### 1️⃣ Wire 어휘와 도메인 어휘를 분리한다
+## 네 가지 원칙
+
+<span id="1️⃣-wire-어휘와-도메인-어휘를-분리한다" className="heading-alias" aria-hidden="true" />
+
+### 1. Wire 어휘와 도메인 어휘를 분리한다
 
 - 핸들러 파일이 직접 store action 을 호출하지 말 것.
 - 그 사이에 **변환층**을 둔다.
 
-### 2️⃣ Event → Intent 변환은 thin / pure / 1:1
+<span id="2️⃣-event--intent-변환은-thin--pure--11" className="heading-alias" aria-hidden="true" />
+
+### 2. Event → Intent 변환은 thin / pure / 1:1
 
 - 변환층은 어떤 store / hook / lifecycle 도 모른다.
 - 입력은 wire event, 출력은 intent (또는 intent 배열).
 - 같은 입력에는 항상 같은 출력 → idempotent.
 
-### 3️⃣ Core state machine 은 wire 어휘를 모른다
+<span
+  id="3️⃣-core-state-machine-은-wire-어휘를-모른다"
+  className="heading-alias"
+  aria-hidden="true"
+/>
+
+### 3. Core state machine 은 wire 어휘를 모른다
 
 - Store action 의 시그니처에 wire event 가 등장하지 않는다.
 - 새 wire event 가 추가되어도 store 의 action 목록은 안 늘어난다.
 - **진짜 새 의미**일 때만 새 intent 가 추가된다.
 
-### 4️⃣ Lifecycle 은 store 의 책임이지 handler 의 책임이 아니다
+<span
+  id="4️⃣-lifecycle-은-store-의-책임이지-handler-의-책임이-아니다"
+  className="heading-alias"
+  aria-hidden="true"
+/>
+
+### 4. Lifecycle 은 store 의 책임이지 handler 의 책임이 아니다
 
 - 핸들러가 `reset()` 직후의 상태를 알아야 정상 동작한다면 그건 책임 누설이다.
 - Store 의 reset 은 "어떤 필드를 preserve / wipe 할지" 를 자체 정책으로 명시한다.
@@ -140,9 +189,17 @@ const handlers = {
 
 ---
 
-## 🔗 새 구조 — Translator → Dispatcher → Store action
+<span
+  id="-새-구조--translator--dispatcher--store-action"
+  className="heading-alias"
+  aria-hidden="true"
+/>
 
-### ⬇️ 데이터 흐름 비교
+## 새 구조 — Translator → Dispatcher → Store action
+
+<span id="️-데이터-흐름-비교" className="heading-alias" aria-hidden="true" />
+
+### 데이터 흐름 비교
 
 - **리팩터 이전**
 
@@ -166,7 +223,9 @@ SSE wire ──→ parse ──→ Translator ──→ Intent dispatcher ──
                        여기만 갱신        어느 store action 호출       되는 단일 출처
 ```
 
-### 💡 각 층이 모르는 것
+<span id="-각-층이-모르는-것" className="heading-alias" aria-hidden="true" />
+
+### 각 층이 모르는 것
 
 - **Translator** — store 가 있다는 걸 모른다. wire event 를 받아 intent 객체만 돌려준다. **순수 함수**.
 - **Dispatcher** — wire event 가 있다는 걸 모른다. intent 를 받아 store action 만 호출한다.
@@ -174,7 +233,9 @@ SSE wire ──→ parse ──→ Translator ──→ Intent dispatcher ──
 
 > 분리의 본질은 레이어 수를 늘리는 게 아니라, **각 레이어가 모르는 것을 명확히 만드는 일**이다.
 
-### ⬇️ 코드로 보면
+<span id="️-코드로-보면" className="heading-alias" aria-hidden="true" />
+
+### 코드로 보면
 
 - **리팩터 이전**
 
@@ -217,17 +278,19 @@ export function dispatchReasoningIntent(
 },
 ```
 
-### 🤔 이렇게 나누면 정말 좋은 게 뭔데?
+<span id="-이렇게-나누면-정말-좋은-게-뭔데" className="heading-alias" aria-hidden="true" />
+
+### 이렇게 나누면 정말 좋은 게 뭔데?
 
 - 변경의 영향 범위가 **레이어 한 층에 갇힌다**.
 
-| 변경 종류 | 영향 받는 층 |
-|---|---|
-| BE 가 `run.started` 를 `run.begin` 으로 rename | Translator 한 줄. core 무영향 |
-| BE 가 `human_input.requested.kind` 에 새 값 추가 | Translator 의 narrowing 분기. core 무영향 |
-| BE 가 새 event 추가 | Translator 에 항목 추가. 의미가 진짜 새로우면 그때만 intent + store action 추가 |
-| FE store 의 reset 정책 변경 | Store 자체. handler 무영향 |
-| 새 surface (mobile / embed) 추가 | core 그대로 재사용 |
+| 변경 종류                                        | 영향 받는 층                                                                    |
+| ------------------------------------------------ | ------------------------------------------------------------------------------- |
+| BE 가 `run.started` 를 `run.begin` 으로 rename   | Translator 한 줄. core 무영향                                                   |
+| BE 가 `human_input.requested.kind` 에 새 값 추가 | Translator 의 narrowing 분기. core 무영향                                       |
+| BE 가 새 event 추가                              | Translator 에 항목 추가. 의미가 진짜 새로우면 그때만 intent + store action 추가 |
+| FE store 의 reset 정책 변경                      | Store 자체. handler 무영향                                                      |
+| 새 surface (mobile / embed) 추가                 | core 그대로 재사용                                                              |
 
 - 이전에는 한 줄을 바꿀 때마다 lifecycle 까지 거슬러 올라가는 git blame 사파리를 떠나야 했다.
 
@@ -235,9 +298,17 @@ export function dispatchReasoningIntent(
 
 ---
 
-## 🔗 단계적 마이그레이션 — 한 번에 다 갈 수는 없다
+<span
+  id="-단계적-마이그레이션--한-번에-다-갈-수는-없다"
+  className="heading-alias"
+  aria-hidden="true"
+/>
 
-### 🚫 한 PR 로 갈아엎으려는 욕심
+## 단계적 마이그레이션 — 한 번에 다 갈 수는 없다
+
+<span id="-한-pr-로-갈아엎으려는-욕심" className="heading-alias" aria-hidden="true" />
+
+### 한 PR 로 갈아엎으려는 욕심
 
 - 이걸 한 방에 다 갈아엎겠다고 덤볐다가는 streaming hot path 의 정교한 튜닝 (leaf 격리, drain pacer, owner 가드) 이 한꺼번에 무너진다.
 
@@ -278,10 +349,7 @@ export type RunIntent =
   | { kind: "enterStreaming" }
   | { kind: "enterToolCalling" };
 
-export function applyRunLifecycle(
-  state: RunLifecycleState,
-  intent: RunIntent,
-): RunLifecycleState;
+export function applyRunLifecycle(state: RunLifecycleState, intent: RunIntent): RunLifecycleState;
 ```
 
 - 순수 함수로 빼두면 store 의 action 은 **transition 자체를 위임**하는 얇은 래퍼가 된다.
@@ -325,9 +393,17 @@ const dispatcher = createIntentDispatcher(deps);
 
 ---
 
-## 🔗 리팩터링이 끝난 자리에서 본 것
+<span id="-리팩터링이-끝난-자리에서-본-것" className="heading-alias" aria-hidden="true" />
 
-### 💡 가장 크게 바뀐 것 — 변경 영향 범위가 측정 가능해졌다
+## 리팩터링이 끝난 자리에서 본 것
+
+<span
+  id="-가장-크게-바뀐-것--변경-영향-범위가-측정-가능해졌다"
+  className="heading-alias"
+  aria-hidden="true"
+/>
+
+### 가장 크게 바뀐 것 — 변경 영향 범위가 측정 가능해졌다
 
 - BE 가 wire event 를 rename 한다 → translator 한 줄만 보면 된다.
 - store 의 reset 정책을 바꾼다 → JSDoc 의 preserve 목록을 갱신한다.
@@ -337,7 +413,13 @@ const dispatcher = createIntentDispatcher(deps);
 > Translator 는 store 를 모른다. Dispatcher 는 wire 를 모른다. Store 는 lifecycle 의 외부 호출자를 모른다.  
 > "모른다" 가 보장되어야 비로소 한 층의 변경이 다른 층으로 전염되지 않는다.
 
-### 🤔 비슷한 구조에서 똑같이 고민 중인 사람에게
+<span
+  id="-비슷한-구조에서-똑같이-고민-중인-사람에게"
+  className="heading-alias"
+  aria-hidden="true"
+/>
+
+### 비슷한 구조에서 똑같이 고민 중인 사람에게
 
 - 만약 SSE 기반 / 실시간 이벤트 기반 아키텍처에서 핸들러가 비대해지고 있다면, 다음 질문을 던져보면 좋겠다.
 

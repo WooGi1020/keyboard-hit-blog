@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function FlippableAvatar({
@@ -10,7 +11,7 @@ export default function FlippableAvatar({
   fallback: string;
 }) {
   return (
-    <div className="group size-32 max-sm:hidden perspective-[1000px] cursor-pointer">
+    <div className="about-avatar group size-32 max-sm:hidden perspective-[1000px] cursor-pointer">
       <div className="relative h-full w-full transition-transform duration-1500 transform-3d group-hover:transform-[rotateY(360deg)] will-change-transform">
         <div className="absolute inset-0 backface-hidden [-webkit-backface-visibility:hidden]">
           <Avatar className="size-full border-2 border-chart-1 rounded-full p-1">
@@ -19,11 +20,16 @@ export default function FlippableAvatar({
           </Avatar>
         </div>
 
-        <div className="absolute inset-0 h-full w-full rounded-full border-2 border-chart-2 p-1 bg-white backface-hidden [-webkit-backface-visibility:hidden] overflow-hidden transform-[rotateY(180deg)]">
-          <img
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full rounded-full border-2 border-chart-2 p-1 bg-white backface-hidden [-webkit-backface-visibility:hidden] overflow-hidden transform-[rotateY(180deg)]"
+        >
+          <Image
             src={backSrc}
-            alt="아바타 뒷면"
-            className="h-full w-full object-contain scale-120 translate-y-1"
+            alt=""
+            fill
+            sizes="128px"
+            className="object-contain scale-120 translate-y-1"
           />
         </div>
       </div>

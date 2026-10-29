@@ -1,11 +1,10 @@
-import HeaderNav from "@/components/header/HeaderNav";
+import HeaderNav from "./HeaderNav";
 
 function Header() {
   return (
-    <header className="fixed inset-0 h-[60px] border-b-2 border-b-input flex items-center w-full z-50 bg-background dark:bg-back">
+    <header className="site-header">
       <HeaderNav />
     </header>
   );
 }
-
 export default Header;

@@ -13,9 +13,9 @@ function PostContent({ code }: PostContentProps) {
   const content = createElement(parseMDX(code), { components });
 
   return (
-    <article className="relative w-full max-w-[900px] mx-auto">
+    <article className="post-content">
       <CustomToc />
-      <div className="prose dark:prose-invert max-w-none break-keep">{content}</div>
+      <div className="post-prose">{content}</div>
     </article>
   );
 }

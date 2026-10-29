@@ -7,12 +7,16 @@ createdDate: 2025-12-31 16:48:01
 
 <TOC />
 
-# ✨ 들어가며
+<span id="-들어가며" className="heading-alias" aria-hidden="true" />
+
+# 들어가며
 
 - 예전부터 구독하고 있는 [Korea FE Article](https://kofearticle.substack.com/)에서 리액트 라우터의 서버 컴포넌트 접근 방식을 다룬 글을 보내주셨다.
 - 기존에 리액트 라우터를 사용했던 방식은 `data mode`로, 클라이언트 컴포넌트(이하 CC)에서 데이터를 다루는 방식이었는데, 해당 글을 통해 리액트 라우터 v7에서 지향하는 서버 컴포넌트(이하 RSC) 생태계에 대해 알아보려고 한다.
 
-## 🔗 리액트 라우터란?
+<span id="-리액트-라우터란" className="heading-alias" aria-hidden="true" />
+
+## 리액트 라우터란?
 
 - [리액트 라우터](https://reactrouter.com/)는 리액트 애플리케이션에서 라우팅을 관리하기 위한 라이브러리로서 사용되어 왔다. (보통 SPA를 자주 다루는 분들이라면 익숙할 것이라고 생각한다.)
 - 하지만 `Next.js`, `Remix`와 같은 풀스택 프레임워크의 등장과 더불어 리액트 라우터 v7 부터는 RSC를 지원하는 `framework mode`를 도입, 풀스택 프레임워크로서 변화하고 있다.
@@ -22,7 +26,9 @@ createdDate: 2025-12-31 16:48:01
 기존에 사용하던 data mode가 아닌 framework mode를 통해 RSC 설계를 체험한 경험을 공유하고자 한다.
 ```
 
-## 🔗 프로젝트 초기 세팅
+<span id="-프로젝트-초기-세팅" className="heading-alias" aria-hidden="true" />
+
+## 프로젝트 초기 세팅
 
 - 일단 나의 경우, RSC 환경 체험을 위해 `MSW`를 활용한 목업 서버와 `Vite`를 활용한 리액트 프로젝트를 모노 레포 환경으로 세팅했다.
 
@@ -58,11 +64,15 @@ src
 
 > 여기까지 진행하면 어느정도 준비 👌
 
-# ✨ 리액트 라우터의 RSC 접근 방식
+<span id="-리액트-라우터의-rsc-접근-방식" className="heading-alias" aria-hidden="true" />
+
+# 리액트 라우터의 RSC 접근 방식
 
 - 리액트 라우터 v7에서는 RSC를 지원하기 위해 몇 가지 주요 개념과 기능을 도입했다.
 
-## 🔗 라우트 단위의 데이터 페칭
+<span id="-라우트-단위의-데이터-페칭" className="heading-alias" aria-hidden="true" />
+
+## 라우트 단위의 데이터 페칭
 
 - 리액트 라우터 v7에서는 각 라우트 컴포넌트에서 데이터를 페칭할 수 있는 `loader` 함수를 제공한다.
 
@@ -98,7 +108,9 @@ return (
 
 - 직접 사용해보니, 라우트 단위로 데이터를 관리하는 것은 UX측면에서 페이지 간 전환 시 데이터 페칭을 효율적으로 처리하고, DX측면에서 라우트별로 데이터를 관리하여 유지보수성을 높이는데 좋은 방식이라는 생각이 들었다.
 
-## 🔗 폼 처리와 액션
+<span id="-폼-처리와-액션" className="heading-alias" aria-hidden="true" />
+
+## 폼 처리와 액션
 
 - 리액트 라우터 v7에서는 폼 제출을 처리하기 위한 `action` 함수를 제공한다.
 
@@ -143,7 +155,9 @@ return (
 
 > 특히 기존의 폼 처리 방식과 비교하여 제출 로직 자체를 서버 측으로 이관했다는 점에서 신선했고 무엇보다 RSC의 지향점을 잘 살린 접근 방식이라고 생각한다.
 
-## 🔗 loader와 action 활용하기
+<span id="-loader와-action-활용하기" className="heading-alias" aria-hidden="true" />
+
+## loader와 action 활용하기
 
 - 앞서 설명한 `loader`와 `action` 함수를 활용하면 프론트 서버에서 쿠키 관리 로직을 작성하여 인증 흐름을 처리하고, 부가적으로 메세지 피드백 등의 로직도 구현이 가능해진다.
 
@@ -223,7 +237,9 @@ useEffect(() => {
 }, [toast]);
 ```
 
-## 🔗 useFetcher를 사용한 부분 데이터 페칭
+<span id="-usefetcher를-사용한-부분-데이터-페칭" className="heading-alias" aria-hidden="true" />
+
+## useFetcher를 사용한 부분 데이터 페칭
 
 - 리액트 라우터 v7은 `useFetcher` 훅을 제공하여 컴포넌트 내에서 부분적으로 데이터 페칭과 폼 제출을 처리할 수 있다.
 
@@ -333,7 +349,9 @@ export default function ProductDetail() {
 사실 Next.js를 주로 사용해왔기에 리액트 라우터의 RSC 접근 방식이 다소 생소하게 느껴졌지만, 직접 사용해보니 충분히 매력적인 생태계라는 생각이 들었고, 오히려 라우트 단위의 환경 분리를 통해 하이브리드틱한 RSC 설계가 가능하다는 점이 인상적이었다.
 ```
 
-# ✨ 마치며
+<span id="-마치며" className="heading-alias" aria-hidden="true" />
+
+# 마치며
 
 - 리액트 라우터 v7의 RSC 접근 방식은 라우트 단위의 데이터 페칭, 폼 처리와 액션, `useFetcher`를 통한 부분 데이터 페칭 등 다양한 기능을 제공하여 풀스택 애플리케이션 개발을 보다 효율적으로 만들어준다.
 

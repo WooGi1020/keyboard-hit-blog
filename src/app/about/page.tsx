@@ -9,7 +9,7 @@ import {
 
 function AboutPage() {
   return (
-    <div className="flex flex-col gap-16 w-full">
+    <div className="about-page">
       <AboutMeta />
       <AboutOpinion />
       <AboutCareer />
