@@ -1,19 +1,9 @@
-export interface CareerProject {
-  name: string;
-  subtitle: string;
-  period: string;
-  stack: string[];
-  summary: string;
-  caseHref?: string;
-  caseTitle?: string;
-}
-
 export interface Career {
   company: string;
   role: string;
   period: string;
   summary: string;
-  projects: CareerProject[];
+  highlights: string[];
 }
 
 const ABOUT_ME = {
@@ -33,39 +23,11 @@ const ABOUT_ME = {
       company: "(주)프롬프트타운",
       role: "프론트엔드 엔지니어",
       period: "2026.04 ~ 현재",
-      summary:
-        "AI 에이전트 플랫폼 Smoody를 만드는 회사에서 프론트엔드를 맡고 있습니다. 에이전트와 대화하는 제품 화면과 그 밑의 클라이언트 SDK, 사내 팀이 쓰는 마케팅 업무 도구(화면부터 서버·외부 서비스 연동·배포까지), 여러 제품이 공유하는 디자인 기준을 담당했습니다.",
-      projects: [
-        {
-          name: "Smoody Platform FE",
-          subtitle: "에이전트 대화 화면과 클라이언트 SDK",
-          period: "2026.04 ~ 현재",
-          stack: ["React", "TypeScript", "Vite", "SSE"],
-          summary:
-            "에이전트의 답변이 실시간으로 흘러오는 대화 화면과, 그 통신을 맡는 클라이언트 SDK를 만들었습니다. 화면 안의 훅 하나로 시작한 SDK를 별도 패키지로 독립시키고 계층을 나눠, 서버가 바뀌어도 화면이 흔들리지 않게 했습니다. 설치된 패키지 기준으로 검증을 자동화하고, 번들 크기를 예산으로 관리합니다.",
-          caseHref: "/posts/Portfolio/chat-runtime-connection-vs-run",
-          caseTitle: "SSE 연결이 끊기면 실행도 끝난 걸까?",
-        },
-        {
-          name: "Smoody Scouter",
-          subtitle: "마케팅 아웃리치 업무 도구 — 프론트·백엔드 통합 개발과 운영",
-          period: "2026.10 ~ 현재",
-          stack: ["Next.js", "React", "PostgreSQL", "OAuth 2.0", "AWS"],
-          summary:
-            "에이전트가 만든 초안을 사람이 검토하고 승인한 뒤에만 발송되는 업무 흐름을 화면부터 서버, 데이터 저장까지 만들었습니다. Gmail·YouTube·Meta 같은 외부 서비스 연동과 보안 검토, 배포와 운영 스케줄러까지 프론트와 백엔드를 한 흐름으로 맡았습니다.",
-          caseHref: "/posts/Portfolio/human-approval-and-agent-writes",
-          caseTitle: "내가 승인한 초안이 그대로 발송되려면",
-        },
-        {
-          name: "Smoody Design System",
-          subtitle: "여러 제품이 함께 쓰는 디자인 시스템",
-          period: "2026.09 ~ 현재",
-          stack: ["React", "Base UI", "Tailwind CSS", "Design Tokens"],
-          summary:
-            "색상과 간격 같은 디자인 기준을 한 곳에서 관리하고 코드로 배포하는 체계를 만들었습니다. 제품마다 요구가 달라지자, 모두가 공유할 것과 각 제품이 직접 가질 것의 경계를 다시 정해 운영 부담을 줄였습니다.",
-          caseHref: "/posts/Portfolio/design-system-product-owned-ui",
-          caseTitle: "공통 UI를 제품 코드로 옮긴 이유",
-        },
+      summary: "현재 AI 통합 솔루션 Smoody 프로젝트에 기여하고 있습니다.",
+      highlights: [
+        "에이전트 대화 화면과 서버 통신을 맡는 클라이언트 SDK 개발",
+        "사내 마케팅 업무 도구의 화면·서버·외부 서비스 연동·배포까지 통합 개발과 운영",
+        "여러 제품이 함께 쓰는 디자인 시스템과 디자인 토큰 체계 구축",
       ],
     },
   ] satisfies Career[],

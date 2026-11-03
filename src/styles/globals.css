@@ -1414,57 +1414,28 @@
   line-height: 1.9;
   word-break: keep-all;
 }
-.about-career-timeline {
-  border-left: 1px solid var(--reading-line);
+.about-career-highlights {
+  display: grid;
+  gap: 8px;
   margin-left: 4px;
+  padding-left: 20px;
+  border-left: 1px solid var(--reading-line);
 }
-.about-career-project {
+.about-career-highlights li {
   position: relative;
-  padding: 0 0 32px 24px;
+  font-size: 15px;
+  line-height: 1.8;
+  word-break: keep-all;
 }
-.about-career-project:last-child {
-  padding-bottom: 0;
-}
-.about-career-project::before {
+.about-career-highlights li::before {
   content: "";
   position: absolute;
-  left: -4px;
+  left: -24px;
   top: calc((27px - 7px) / 2);
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: hsl(var(--chart-1));
-}
-.about-project-heading {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 4px 12px;
-}
-.about-project-heading h4 {
-  color: hsl(var(--foreground));
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.5;
-}
-.about-project-heading > span {
-  color: var(--reading-soft);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-}
-.about-project-subtitle {
-  margin-top: 6px;
-  color: var(--reading-soft);
-  font-size: 13px;
-  line-height: 1.75;
-  word-break: keep-all;
-}
-.about-project-summary {
-  margin: 12px 0 14px;
-  font-size: 15px;
-  line-height: 1.9;
-  word-break: keep-all;
 }
 .about-stack {
   display: flex;
@@ -1480,30 +1451,6 @@
   font-size: 11px;
   line-height: 1.6;
   overflow-wrap: anywhere;
-}
-.about-case-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  margin-top: 8px;
-  color: hsl(var(--foreground));
-  font-size: 13px;
-  line-height: 1.7;
-  text-decoration: underline;
-  text-decoration-color: hsl(var(--chart-1) / 0.55);
-  text-underline-offset: 4px;
-}
-.about-case-link span {
-  min-width: 0;
-  word-break: keep-all;
-}
-.about-case-link svg {
-  flex-shrink: 0;
-  color: hsl(var(--chart-1));
-}
-.about-case-link:hover {
-  text-decoration-color: hsl(var(--chart-1));
 }
 .about-skills-grid {
   display: grid;
