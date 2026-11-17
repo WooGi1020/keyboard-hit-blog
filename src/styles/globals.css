@@ -858,6 +858,22 @@
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
+.study-hero {
+  padding-bottom: 28px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--reading-line);
+}
+.study-hero h1 {
+  color: hsl(var(--foreground));
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+}
+.study-empty {
+  color: var(--reading-soft);
+  font-size: 14px;
+}
 .home-posts-heading {
   display: flex;
   align-items: baseline;

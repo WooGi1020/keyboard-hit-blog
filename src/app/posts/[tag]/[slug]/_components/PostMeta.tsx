@@ -3,6 +3,7 @@ import { getFormattedDate } from "@/utils/getDate";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { LazyLoadLottieMonitor } from "@/components/lazy/LazyWrapper";
+import { STUDY_PATH, STUDY_TAG } from "@/constant/STUDY";
 
 interface PostMetaProps {
   tag: string;
@@ -15,7 +16,7 @@ function PostMeta({ tag, slug }: PostMetaProps) {
   return (
     <header className="post-header">
       <div className="post-heading-top">
-        <Link href={`/posts/${tag}`} className="post-category">
+        <Link href={tag === STUDY_TAG ? STUDY_PATH : `/posts/${tag}`} className="post-category">
           {tag}
         </Link>
         <div className="post-heading-visual" aria-hidden="true">
