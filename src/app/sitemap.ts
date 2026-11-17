@@ -12,6 +12,12 @@ const defaultSiteMaps: MetadataRoute.Sitemap = [
     priority: 1,
   },
   {
+    url: `${baseUrl}/study`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.8,
+  },
+  {
     url: `${baseUrl}/about`,
     lastModified: new Date(),
     changeFrequency: "daily",

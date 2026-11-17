@@ -6,6 +6,7 @@ import getImagePath from "@/utils/getImagePath";
 
 import { LazyLoadGiscus } from "@/components/lazy/LazyWrapper";
 import { getFormattedDate } from "@/utils/getDate";
+import { STUDY_TAG } from "@/constant/STUDY";
 
 interface Params {
   tag: string;
@@ -32,12 +33,16 @@ export async function generateMetadata({ params }: Props) {
     title: post.title,
     description: post.description!,
     asPath: `/posts/${tag}/${slug}`,
-    ogImage: getImagePath(
-      post.title,
-      tag,
-      formattedDate,
-      post.updatedDate ? getFormattedDate(post.updatedDate, "YYYY-MM-DD") : undefined
-    ),
+    // 스터디 글은 글마다 이미지를 만들지 않고 블로그 기본 공유 이미지를 쓴다.
+    ogImage:
+      tag === STUDY_TAG
+        ? undefined
+        : getImagePath(
+            post.title,
+            tag,
+            formattedDate,
+            post.updatedDate ? getFormattedDate(post.updatedDate, "YYYY-MM-DD") : undefined
+          ),
   });
 }
 

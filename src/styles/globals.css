@@ -858,6 +858,101 @@
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
+.study-hero {
+  padding-bottom: 28px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--reading-line);
+}
+.study-hero h1 {
+  color: hsl(var(--foreground));
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+}
+.study-list {
+  border-top: 1px solid var(--reading-line);
+}
+.study-item {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 16px;
+  padding: 24px 8px;
+  border-bottom: 1px solid var(--reading-line);
+}
+.study-item-index {
+  padding-top: 4px;
+  color: var(--reading-soft);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.study-item-copy h3 {
+  color: hsl(var(--foreground));
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.study-item-copy p {
+  margin-top: 6px;
+  color: var(--reading-soft);
+  font-size: 14px;
+  line-height: 1.75;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.study-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 12px;
+  color: var(--reading-soft);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.study-item-arrow {
+  margin-top: 6px;
+  color: var(--reading-soft);
+  transition:
+    color 0.2s,
+    transform 0.2s;
+}
+.study-item:hover,
+.study-item:focus-visible {
+  background: hsl(var(--foreground) / 0.03);
+}
+.study-item:hover .study-item-index,
+.study-item:focus-visible .study-item-index {
+  color: hsl(var(--chart-1));
+}
+.study-item:hover .study-item-arrow,
+.study-item:focus-visible .study-item-arrow {
+  color: hsl(var(--foreground));
+  transform: translate(2px, -2px);
+}
+@media (max-width: 639px) {
+  .study-item {
+    grid-template-columns: 28px minmax(0, 1fr);
+    gap: 12px;
+    padding: 20px 4px;
+  }
+  .study-item-arrow {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .study-item-arrow {
+    transition: none;
+  }
+}
+.study-empty {
+  color: var(--reading-soft);
+  font-size: 14px;
+}
 .home-posts-heading {
   display: flex;
   align-items: baseline;
